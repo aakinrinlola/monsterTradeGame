@@ -18,7 +18,7 @@ public class UserService {
 
     public boolean addUser(User user) throws SQLException {
         // Überprüfen, ob der Benutzername bereits existiert
-        if (userRepo.findByName(user.getName()) != null) {
+        if (userRepo.findByName(user.getUsername()) != null) {
             throw new IllegalArgumentException("A user with this name already exists.");
         }
         return userRepo.saveUser(user);
@@ -27,7 +27,7 @@ public class UserService {
     public String authenticateUser(String name, String passwordHash) throws SQLException {
         // Benutzer anhand des Namens suchen
         User existingUser = userRepo.findByName(name);
-        if (existingUser == null || !existingUser.getPasswordHash().equals(passwordHash)) {
+        if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
             throw new IllegalArgumentException("Invalid username or password.");
         }
         // Generiere ein neues Session-Token

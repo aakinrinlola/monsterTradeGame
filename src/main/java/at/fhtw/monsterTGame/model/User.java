@@ -2,17 +2,17 @@ package at.fhtw.monsterTGame.model;
 
 public class User {
     private int userId;
-    private String name;
-    private String passwordHash;
+    private String username;
+    private String password;
     private String sessionToken;
 
     // Standard-Konstruktor
     public User() {}
 
     // Konstruktor zur Initialisierung
-    public User(String name, String passwordHash) {
-        this.name = name;
-        this.passwordHash = passwordHash;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
         this.sessionToken = null;
     }
 
@@ -25,20 +25,20 @@ public class User {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getSessionToken() {

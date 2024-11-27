@@ -15,10 +15,10 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 public class UserController implements RestController {
-    private final UserService userManager;
+    private final UserService userService;
 
     public UserController() {
-        this.userManager = new UserService();
+        this.userService = new UserService();
     }
 
     @Override
@@ -41,24 +41,24 @@ public class UserController implements RestController {
             User inputUser = mapper.readValue(request.getBody(), User.class);
 
             // Benutzername validieren
-            if (inputUser.getName() == null || inputUser.getName().isEmpty()) {
+            if (inputUser.getUsername() == null || inputUser.getUsername().isEmpty()) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Name is required\"}");
             }
 
             // Passwort-Hash validieren
-            if (inputUser.getPasswordHash() == null || inputUser.getPasswordHash().isEmpty()) {
+            if (inputUser.getPassword() == null || inputUser.getPassword().isEmpty()) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Password is required\"}");
             }
 
             try {
                 // Benutzer existiert, Anmeldung durchführen
-                User existingUser = userManager.getUserByName(inputUser.getName());
+                User existingUser = userService.getUserByName(inputUser.getUsername());
                 if (existingUser != null) {
-                    String sessionToken = userManager.authenticateUser(inputUser.getName(), inputUser.getPasswordHash());
+                    String sessionToken = userService.authenticateUser(inputUser.getUsername(), inputUser.getPassword());
                     existingUser.setSessionToken(sessionToken);
 
                     // Erfolgslog
-                    System.out.println("User logged in: " + existingUser.getName() + " (Token: " + existingUser.getSessionToken() + ")");
+                    System.out.println("User logged in: " + existingUser.getUsername() + " (Token: " + existingUser.getSessionToken() + ")");
 
                     // JSON-Antwort erstellen
                     String jsonResponse = mapper.writeValueAsString(existingUser);
@@ -69,10 +69,10 @@ public class UserController implements RestController {
             }
 
             // Neuen Benutzer registrieren
-            userManager.addUser(inputUser);
+            userService.addUser(inputUser);
 
             // Erfolgslog
-            System.out.println("User successfully registered: " + inputUser.getName());
+            System.out.println("User successfully registered: " + inputUser.getUsername());
 
             // Erfolgsantwort
             return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"User successfully registered\"}");
@@ -86,14 +86,15 @@ public class UserController implements RestController {
 
     private Response processGetRequest(Request request) {
         try {
-            Collection<User> allUsers = userManager.getAllUsers();
+            Collection<User> allUsers = userService.getAllUsers();
             String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);
             return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-
+        } catch (SQLException sqlEx) {
+            // Loggen des Fehlers
+            System.err.println("SQL Error: " + sqlEx.getMessage());
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error: " + sqlEx.getMessage() + "\"}");
         } catch (IllegalAccessException ex) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Access denied: " + ex.getMessage() + "\"}");
-        } catch (SQLException sqlEx) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + sqlEx.getMessage() + "\"}");
         } catch (JsonProcessingException jsonEx) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Error serializing user data\"}");
         }

@@ -17,21 +17,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByName(String name) throws SQLException {
-        String sql = "SELECT * FROM users WHERE name = ?";
+    public User findByName(String username) throws SQLException {
+        String sql = "SELECT * FROM users WHERE username = ?";
         try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
-            statement.setString(1, name);
+            statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 User user = new User();
                 user.setUserId(resultSet.getInt("id"));
-                user.setName(resultSet.getString("name"));
-                user.setPasswordHash(resultSet.getString("password_hash"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
                 user.setSessionToken(resultSet.getString("session_token"));
                 return user;
             }
         } catch (SQLException e) {
-            throw new SQLException("Error while finding user by name: " + name, e);
+            throw new SQLException("Error while finding user by name: " + username, e);
         }
         return null;
     }
@@ -45,8 +45,8 @@ public class UserRepositoryImpl implements UserRepository {
             while (resultSet.next()) {
                 User user = new User();
                 user.setUserId(resultSet.getInt("id"));
-                user.setName(resultSet.getString("name"));
-                user.setPasswordHash(resultSet.getString("password_hash"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
                 user.setSessionToken(resultSet.getString("session_token"));
                 users.add(user);
             }
@@ -58,14 +58,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean saveUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (name, password_hash, session_token) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, session_token) VALUES (?, ?, ?)";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
-            statement.setString(1, user.getName());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getSessionToken());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new SQLException("Error while saving user: " + user.getName(), e);
+            throw new SQLException("Error while saving user: " + user.getUsername(), e);
         }
     }
 
@@ -81,14 +81,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void updateTocken(String name, String sessionToken) throws SQLException {
-        String sql = "UPDATE users SET session_token = ? WHERE name = ?";
+    public void updateTocken(String username, String sessionToken) throws SQLException {
+        String sql = "UPDATE users SET session_token = ? WHERE username = ?";
         try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
             statement.setString(1, sessionToken);
-            statement.setString(2, name);
+            statement.setString(2, username);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new SQLException("Error while updating session token for user: " + name, e);
+            throw new SQLException("Error while updating session token for user: " + username, e);
         }
     }
 }
