@@ -27,7 +27,7 @@ public class UserRepositoryImpl implements UserRepository {
                 user.setUserId(resultSet.getInt("id"));
                 user.setUsername(resultSet.getString("username"));
                 user.setPassword(resultSet.getString("password"));
-                user.setSessionToken(resultSet.getString("session_token"));
+                user.setSessionToken(resultSet.getString("token")); // Ändere hier zu "token"
                 return user;
             }
         } catch (SQLException e) {
@@ -47,7 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
                 user.setUserId(resultSet.getInt("id"));
                 user.setUsername(resultSet.getString("username"));
                 user.setPassword(resultSet.getString("password"));
-                user.setSessionToken(resultSet.getString("session_token"));
+                user.setSessionToken(resultSet.getString("token")); // Ändere hier zu "token"
                 users.add(user);
             }
             return users;
@@ -58,7 +58,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean saveUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password, session_token) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, token) VALUES (?, ?, ?)"; // Ändere hier zu "token"
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
@@ -66,6 +66,18 @@ public class UserRepositoryImpl implements UserRepository {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new SQLException("Error while saving user: " + user.getUsername(), e);
+        }
+    }
+
+    @Override
+    public void updateTocken(String username, String sessionToken) throws SQLException {
+        String sql = "UPDATE users SET token = ? WHERE username = ?"; // Ändere hier zu "token"
+        try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
+            statement.setString(1, sessionToken);
+            statement.setString(2, username);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Error while updating session token for user: " + username, e);
         }
     }
 
@@ -80,15 +92,4 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    @Override
-    public void updateTocken(String username, String sessionToken) throws SQLException {
-        String sql = "UPDATE users SET session_token = ? WHERE username = ?";
-        try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
-            statement.setString(1, sessionToken);
-            statement.setString(2, username);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new SQLException("Error while updating session token for user: " + username, e);
-        }
-    }
 }
