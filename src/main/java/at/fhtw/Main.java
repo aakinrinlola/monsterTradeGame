@@ -2,6 +2,7 @@ package at.fhtw;
 
 import at.fhtw.httpserver.server.Server;
 import at.fhtw.httpserver.utils.Router;
+import at.fhtw.monsterTGame.controller.UserController;
 import at.fhtw.sampleapp.controller.EchoController;
 import at.fhtw.sampleapp.controller.WeatherController;
 
@@ -20,8 +21,7 @@ public class Main {
     private static Router configureRouter()
     {
         Router router = new Router();
-        router.addService("/weather", new WeatherController());
-        router.addService("/echo", new EchoController());
+        router.addService("/users", new UserController());
 
         return router;
     }
