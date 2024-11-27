@@ -1,0 +1,58 @@
+@startuml
+class Benutzer {
+  - benutzername: String
+  - passwort: String
+  - münzen: int
+  - eloWert: int
+  - statistik: String
+  - deck: List<Karte>
+  - stapel: List<Karte>
+  + registrieren()
+  + anmelden()
+  + paketKaufen()
+  + deckFestlegen()
+  + kämpfen(gegner: Benutzer)
+  + karteTauschen()
+}
+
+abstract class Karte {
+  - name: String
+  - schaden: int
+  - elementTyp: String
+  + schadenBerechnen()
+}
+
+class MonsterKarte {
+}
+
+class ZauberKarte {
+  + effektivitätBerechnen(gegnerElement: String)
+}
+
+class Paket {
+  - karten: List<Karte>
+  + paketErstellen()
+}
+
+class Kampf {
+  - spieler1: Benutzer
+  - spieler2: Benutzer
+  - kampfProtokoll: String
+  + kampfStarten()
+}
+
+class HandelsLaden {
+  - angebote: List<Handel>
+  + handelHinzufügen()
+  + handelAnnehmen()
+}
+
+Benutzer "1" *-- "viele" Karte
+Karte <|-- MonsterKarte
+Karte <|-- ZauberKarte
+Benutzer "1" o-- "viele" Paket
+Benutzer "1" --> "1" Kampf : nimmt teil an
+Kampf "1" --> "viele" Karte : verwendet
+Benutzer "1" --> "1" HandelsLaden : interagiert mit
+HandelsLaden "1" --> "viele" Karte : verwaltet
+@enduml
