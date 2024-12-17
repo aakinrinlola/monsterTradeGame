@@ -1,6 +1,8 @@
 package at.fhtw.monsterTGame.controller;
 
 import at.fhtw.monsterTGame.model.User;
+import at.fhtw.monsterTGame.persistence.UnitOfWork;
+import at.fhtw.monsterTGame.persistence.repository.UserRepositoryImpl;
 import at.fhtw.monsterTGame.service.UserService;
 import at.fhtw.httpserver.http.ContentType;
 import at.fhtw.httpserver.http.HttpStatus;
@@ -23,11 +25,14 @@ public class UserController implements RestController {
 
     @Override
     public Response handleRequest(Request request) {
-        try {
+        try (UnitOfWork unitOfWork = new UnitOfWork()) {
+            // Pass unitOfWork to the repository or service layer
+            UserRepositoryImpl userRepository = new UserRepositoryImpl(unitOfWork);
+
             if (request.getMethod() == Method.POST) {
-                return processPostRequest(request);
+                return processPostRequest(request, userRepository);
             } else if (request.getMethod() == Method.GET) {
-                return processGetRequest(request);
+                return processGetRequest(request, userRepository);
             }
             return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Unsupported HTTP method\"}");
         } catch (Exception ex) {
@@ -35,7 +40,7 @@ public class UserController implements RestController {
         }
     }
 
-    private Response processPostRequest(Request request) {
+    private Response processPostRequest(Request request, UserRepositoryImpl userRepository) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             User inputUser = mapper.readValue(request.getBody(), User.class);
@@ -50,9 +55,9 @@ public class UserController implements RestController {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Password is required\"}");
             }
 
+            // Benutzer existiert, Anmeldung durchführen
             try {
-                // Benutzer existiert, Anmeldung durchführen
-                User existingUser = userService.getUserByName(inputUser.getUsername());
+                User existingUser = userRepository.findByName(inputUser.getUsername());
                 if (existingUser != null) {
                     String sessionToken = userService.authenticateUser(inputUser.getUsername(), inputUser.getPassword());
                     existingUser.setSessionToken(sessionToken);
@@ -69,7 +74,7 @@ public class UserController implements RestController {
             }
 
             // Neuen Benutzer registrieren
-            userService.addUser(inputUser);
+            userRepository.saveUser(inputUser);
 
             // Erfolgslog
             System.out.println("User successfully registered: " + inputUser.getUsername());
@@ -84,7 +89,7 @@ public class UserController implements RestController {
         }
     }
 
-    private Response processGetRequest(Request request) {
+    private Response processGetRequest(Request request, UserRepositoryImpl userRepository) {
         try {
             Collection<User> allUsers = userService.getAllUsers();
             String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);

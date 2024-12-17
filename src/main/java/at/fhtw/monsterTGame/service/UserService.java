@@ -25,6 +25,16 @@ public class UserService {
     }
 
     public String authenticateUser(String name, String passwordHash) throws SQLException {
+        User existingUser = userRepo.findByName(name);
+        if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
+            throw new IllegalArgumentException("Invalid username or password.");
+        }
+        String sessionToken = "authToken-" + UUID.randomUUID();
+        userRepo.updateTocken(name, sessionToken);
+        return sessionToken;
+    }
+
+    /*public String authenticateUser(String name, String passwordHash) throws SQLException {
         // Benutzer anhand des Namens suchen
         User existingUser = userRepo.findByName(name);
         if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
@@ -34,7 +44,7 @@ public class UserService {
         String sessionToken = "authToken-" + UUID.randomUUID();
         userRepo.updateTocken(name, sessionToken);
         return sessionToken;
-    }
+    }*/
 
     public Collection<User> getAllUsers() throws SQLException, IllegalAccessException {
         // Alle Benutzer abrufen

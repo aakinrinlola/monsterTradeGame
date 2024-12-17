@@ -58,13 +58,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean saveUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password, token) VALUES (?, ?, ?)"; // Ändere hier zu "token"
+        String sql = "INSERT INTO users (username, password, token) VALUES (?, ?, ?)";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getSessionToken());
-            return statement.executeUpdate() > 0;
+            int rowsAffected = statement.executeUpdate();
+            unitOfWork.commitTransaction(); // Sicherstellen, dass die Transaktion abgeschlossen wird
+            System.out.println("Rows affected: " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
+            unitOfWork.rollbackTransaction(); // Rückgängig machen bei Fehlern
             throw new SQLException("Error while saving user: " + user.getUsername(), e);
         }
     }
