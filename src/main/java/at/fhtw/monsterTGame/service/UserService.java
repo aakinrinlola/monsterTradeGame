@@ -24,6 +24,7 @@ public class UserService {
         return userRepo.saveUser(user);
     }
 
+    //falls sich der User einloggt updaten wir den User mit einem Session Token
     public String authenticateUser(String name, String passwordHash) throws SQLException {
         User existingUser = userRepo.findByName(name);
         if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
@@ -54,5 +55,13 @@ public class UserService {
     public User getUserByName(String name) throws SQLException {
         // Benutzer anhand des Namens abrufen
         return userRepo.findByName(name);
+    }
+    public void deleteUser(int userId) throws SQLException {
+        User user = userRepo.findById(userId); // Implementieren Sie findById Methode
+        if (user != null) {
+            userRepo.deleteUser(user);
+        } else {
+            throw new IllegalArgumentException("User not found");
+        }
     }
 }

@@ -17,6 +17,23 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public boolean saveUser(User user) throws SQLException {
+        String sql = "INSERT INTO users (username, password, token) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getSessionToken());
+            int rowsAffected = statement.executeUpdate();
+            unitOfWork.commitTransaction(); // Sicherstellen, dass die Transaktion abgeschlossen wird
+            System.out.println("Rows affected: " + rowsAffected);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            unitOfWork.rollbackTransaction(); // Rückgängig machen bei Fehlern
+            throw new SQLException("Error while saving user: " + user.getUsername(), e);
+        }
+    }
+
+    @Override
     public User findByName(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username = ?";
         try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
@@ -56,22 +73,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    @Override
-    public boolean saveUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password, token) VALUES (?, ?, ?)";
-        try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getSessionToken());
-            int rowsAffected = statement.executeUpdate();
-            unitOfWork.commitTransaction(); // Sicherstellen, dass die Transaktion abgeschlossen wird
-            System.out.println("Rows affected: " + rowsAffected);
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            unitOfWork.rollbackTransaction(); // Rückgängig machen bei Fehlern
-            throw new SQLException("Error while saving user: " + user.getUsername(), e);
-        }
-    }
+
 
     @Override
     public void updateTocken(String username, String sessionToken) throws SQLException {
@@ -94,6 +96,25 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (SQLException e) {
             System.err.println("Failed to delete user with ID: " + user.getUserId() + ". Reason: " + e.getMessage());
         }
+    }
+    @Override
+    public User findById(int userId) throws SQLException {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                User user = new User();
+                user.setUserId(resultSet.getInt("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                user.setSessionToken(resultSet.getString("token"));
+                return user;
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error while finding user by id: " + userId, e);
+        }
+        return null;
     }
 
 }

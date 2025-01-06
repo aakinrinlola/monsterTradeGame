@@ -26,46 +26,43 @@ public class UserController implements RestController {
     @Override
     public Response handleRequest(Request request) {
         try (UnitOfWork unitOfWork = new UnitOfWork()) {
-            // Pass unitOfWork to the repository or service layer
             UserRepositoryImpl userRepository = new UserRepositoryImpl(unitOfWork);
 
             if (request.getMethod() == Method.POST) {
                 return processPostRequest(request, userRepository);
             } else if (request.getMethod() == Method.GET) {
                 return processGetRequest(request, userRepository);
+            } else if (request.getMethod() == Method.DELETE) {
+                return processDeleteRequest(request, userRepository);
             }
             return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Unsupported HTTP method\"}");
         } catch (Exception ex) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
         }
     }
-
+    // POST-Handler - hier wird entweder ein neuer User registriert oder ein vorhandener User authentifiziert
     private Response processPostRequest(Request request, UserRepositoryImpl userRepository) {
         try {
+
+            //Body v Request wird zu einem UserObjekt umgewandel
             ObjectMapper mapper = new ObjectMapper();
             User inputUser = mapper.readValue(request.getBody(), User.class);
 
-            // Benutzername validieren
             if (inputUser.getUsername() == null || inputUser.getUsername().isEmpty()) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Name is required\"}");
             }
 
-            // Passwort-Hash validieren
             if (inputUser.getPassword() == null || inputUser.getPassword().isEmpty()) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Password is required\"}");
             }
 
-            // Benutzer existiert, Anmeldung durchführen
             try {
+                // Schauen, ob der User schon existiert
                 User existingUser = userRepository.findByName(inputUser.getUsername());
                 if (existingUser != null) {
+                    //wenn er existiert SessionToken erstellt
                     String sessionToken = userService.authenticateUser(inputUser.getUsername(), inputUser.getPassword());
                     existingUser.setSessionToken(sessionToken);
-
-                    // Erfolgslog
-                    System.out.println("User logged in: " + existingUser.getUsername() + " (Token: " + existingUser.getSessionToken() + ")");
-
-                    // JSON-Antwort erstellen
                     String jsonResponse = mapper.writeValueAsString(existingUser);
                     return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
                 }
@@ -73,13 +70,8 @@ public class UserController implements RestController {
                 return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Invalid credentials\"}");
             }
 
-            // Neuen Benutzer registrieren
+            // Wenn der User nicht existiert, wird er registriert
             userRepository.saveUser(inputUser);
-
-            // Erfolgslog
-            System.out.println("User successfully registered: " + inputUser.getUsername());
-
-            // Erfolgsantwort
             return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"User successfully registered\"}");
 
         } catch (SQLException sqlEx) {
@@ -89,14 +81,13 @@ public class UserController implements RestController {
         }
     }
 
+    // GET-Handler - liefert eine Liste aller User zurück
     private Response processGetRequest(Request request, UserRepositoryImpl userRepository) {
         try {
             Collection<User> allUsers = userService.getAllUsers();
             String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);
             return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
         } catch (SQLException sqlEx) {
-            // Loggen des Fehlers
-            System.err.println("SQL Error: " + sqlEx.getMessage());
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error: " + sqlEx.getMessage() + "\"}");
         } catch (IllegalAccessException ex) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Access denied: " + ex.getMessage() + "\"}");
@@ -105,4 +96,19 @@ public class UserController implements RestController {
         }
     }
 
+    private Response processDeleteRequest(Request request, UserRepositoryImpl userRepository) {
+        try {
+            String pathname = request.getPathname();
+            String[] pathParts = pathname.split("/");
+            int userId = Integer.parseInt(pathParts[pathParts.length - 1]); // Assuming URL is /users/{id}
+            userService.deleteUser(userId);
+            return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"User deleted successfully\"}");
+        } catch (SQLException sqlEx) {
+            // Fehler bei der Datenbank
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + sqlEx.getMessage() + "\"}");
+        } catch (NumberFormatException ex) {
+            // Fehlerhafte User-ID
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid user ID\"}");
+        }
+    }
 }

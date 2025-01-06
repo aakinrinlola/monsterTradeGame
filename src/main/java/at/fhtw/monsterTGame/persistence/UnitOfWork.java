@@ -17,6 +17,7 @@ public class UnitOfWork implements AutoCloseable {
         }
     }
 
+    // speichert alle Änderungen an der Datenbank
     public void commitTransaction() {
         if (this.connection != null) {
             try {
@@ -27,6 +28,7 @@ public class UnitOfWork implements AutoCloseable {
         }
     }
 
+    // setzt Alle Ändefrugnen zurück wenn Fehler auftritt oder man was abbricht
     public void rollbackTransaction() {
         if (this.connection != null) {
             try {
@@ -37,8 +39,11 @@ public class UnitOfWork implements AutoCloseable {
         }
     }
 
+    //hier wird die Verbindung geschlossen - Sicherstellung dass keine Ressourcen geleaked werden
     public void finishWork() {
+        //wegen der Implementierung von AutoCloseable - kann Verbindung immer geschlossen werden auch bei Ausnahmen
         if (this.connection != null) {
+            //das mit try-with nur wegen der AutoCloseable Impl
             try {
                 this.connection.close();
                 this.connection = null;
@@ -48,6 +53,7 @@ public class UnitOfWork implements AutoCloseable {
         }
     }
 
+    //stellt sicher dass man SQL Befehele vorbereitet werden die dann ausgeführt werden
     public PreparedStatement prepareStatement(String sql) {
         if (this.connection != null) {
             try {

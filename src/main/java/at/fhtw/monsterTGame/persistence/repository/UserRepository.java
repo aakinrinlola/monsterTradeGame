@@ -11,4 +11,6 @@ public interface UserRepository {
     boolean saveUser(User user) throws SQLException;
     void deleteUser(User user);
     void updateTocken(String username, String token) throws SQLException;
+    User findById(int userId) throws SQLException;
+
 }
