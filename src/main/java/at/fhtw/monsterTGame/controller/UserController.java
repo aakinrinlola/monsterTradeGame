@@ -84,17 +84,30 @@ public class UserController implements RestController {
     // GET-Handler - liefert eine Liste aller User zurück
     private Response processGetRequest(Request request, UserRepositoryImpl userRepository) {
         try {
-            Collection<User> allUsers = userService.getAllUsers();
-            String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);
-            return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-        } catch (SQLException sqlEx) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error: " + sqlEx.getMessage() + "\"}");
-        } catch (IllegalAccessException ex) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Access denied: " + ex.getMessage() + "\"}");
-        } catch (JsonProcessingException jsonEx) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Error serializing user data\"}");
+            String pathname = request.getPathname();
+            String[] pathParts = pathname.split("/");
+
+            if (pathParts.length == 2) { // `/users` - Alle Benutzer abrufen
+                Collection<User> allUsers = userService.getAllUsers();
+                String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);
+                return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+            } else if (pathParts.length == 3) { // `/users/{username}` - Einzelnen Benutzer abrufen
+                String username = pathParts[2];
+                User user = userService.getUserByName(username);
+                if (user != null) {
+                    String jsonResponse = new ObjectMapper().writeValueAsString(user);
+                    return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+                } else {
+                    return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"User not found\"}");
+                }
+            } else {
+                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid URL format\"}");
+            }
+        } catch (Exception ex) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
         }
     }
+
 
     private Response processDeleteRequest(Request request, UserRepositoryImpl userRepository) {
         try {
