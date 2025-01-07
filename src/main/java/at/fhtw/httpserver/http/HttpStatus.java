@@ -11,7 +11,8 @@ public enum HttpStatus {
     NOT_FOUND(404, "Not Found"),
     CONFLICT(409, "Conflict"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
-    NOT_IMPLEMENTED(501, "Not Implemented");
+    NOT_IMPLEMENTED(501, "Not Implemented"),
+    METHOD_NOT_ALLOWED(405, "Method Not Allowed" );
 
     public final int code;
     public final String message;

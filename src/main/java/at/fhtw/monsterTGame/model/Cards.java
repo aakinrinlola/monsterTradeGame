@@ -8,58 +8,35 @@ public class Cards {
     private String title;
     private ElementTypeEnum elementType;
     private CardTypeEnum category;
+    private float damage;
+    private int userId; // Verbindung zur User-Tabelle
 
-    // Standard-Konstruktor
     public Cards() {}
 
-    // Konstruktor mit Parametern
-    public Cards(int cardId, String title, ElementTypeEnum elementType, CardTypeEnum category) {
+    public Cards(int cardId, String title, ElementTypeEnum elementType, CardTypeEnum category, float damage, int userId) {
         this.cardId = cardId;
         this.title = title;
         this.elementType = elementType;
         this.category = category;
+        this.damage = damage;
+        this.userId = userId;
     }
 
-    // Getter und Setter
-    public int getCardId() {
-        return cardId;
-    }
+    public int getCardId() { return cardId; }
+    public void setCardId(int cardId) { this.cardId = cardId; }
 
-    public void setCardId(int cardId) {
-        this.cardId = cardId;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getTitle() {
-        return title;
-    }
+    public ElementTypeEnum getElementType() { return elementType; }
+    public void setElementType(ElementTypeEnum elementType) { this.elementType = elementType; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public CardTypeEnum getCategory() { return category; }
+    public void setCategory(CardTypeEnum category) { this.category = category; }
 
-    public ElementTypeEnum getElementType() {
-        return elementType;
-    }
+    public float getDamage() { return damage; }
+    public void setDamage(float damage) { this.damage = damage; }
 
-    public void setElementType(ElementTypeEnum elementType) {
-        this.elementType = elementType;
-    }
-
-    public CardTypeEnum getCategory() {
-        return category;
-    }
-
-    public void setCategory(CardTypeEnum category) {
-        this.category = category;
-    }
-
-    @Override
-    public String toString() {
-        return "Cards{" +
-                "cardId=" + cardId +
-                ", title='" + title + '\'' +
-                ", elementType=" + elementType +
-                ", category=" + category +
-                '}';
-    }
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 }

@@ -3,7 +3,9 @@ package at.fhtw.httpserver.server;
 import at.fhtw.httpserver.http.Method;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Request {
     private Method method;
@@ -13,6 +15,7 @@ public class Request {
     private String params;
     private HeaderMap headerMap =  new HeaderMap();
     private String body;
+    private Map<String, String> headers = new HashMap<>();
 
     public String getServiceRoute(){
         if (this.pathParts == null ||
@@ -101,4 +104,21 @@ public class Request {
     public void setPathParts(List<String> pathParts) {
         this.pathParts = pathParts;
     }
+
+    public String getHeader(String headerName) {
+        if (this.headers != null && this.headers.containsKey(headerName)) {
+            return this.headers.get(headerName);
+        }
+        return null; // Header existiert nicht
+    }
+    public void parseHeaders(String rawHeaders) {
+        String[] lines = rawHeaders.split("\r\n");
+        for (String line : lines) {
+            String[] parts = line.split(": ", 2);
+            if (parts.length == 2) {
+                this.headers.put(parts[0], parts[1]);
+            }
+        }
+    }
+
 }

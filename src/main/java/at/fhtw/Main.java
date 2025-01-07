@@ -2,6 +2,7 @@ package at.fhtw;
 
 import at.fhtw.httpserver.server.Server;
 import at.fhtw.httpserver.utils.Router;
+import at.fhtw.monsterTGame.controller.CardController;
 import at.fhtw.monsterTGame.controller.UserController;
 import at.fhtw.sampleapp.controller.EchoController;
 import at.fhtw.sampleapp.controller.WeatherController;
@@ -22,6 +23,7 @@ public class Main {
     {
         Router router = new Router();
         router.addService("/users", new UserController());
+        router.addService("/cards", new CardController());
 
         return router;
     }
