@@ -24,6 +24,7 @@ public class Main {
         Router router = new Router();
         router.addService("/users", new UserController());
         router.addService("/cards", new CardController());
+        router.addService("/sessions", new UserController());
 
         return router;
     }

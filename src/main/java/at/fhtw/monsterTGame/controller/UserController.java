@@ -1,127 +1,133 @@
 package at.fhtw.monsterTGame.controller;
 
-import at.fhtw.monsterTGame.model.User;
-import at.fhtw.monsterTGame.persistence.UnitOfWork;
-import at.fhtw.monsterTGame.persistence.repository.UserRepositoryImpl;
-import at.fhtw.monsterTGame.service.UserService;
 import at.fhtw.httpserver.http.ContentType;
 import at.fhtw.httpserver.http.HttpStatus;
 import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.RestController;
+import at.fhtw.monsterTGame.model.User;
+import at.fhtw.monsterTGame.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.SQLException;
 import java.util.Collection;
 
+// UserController verwaltet Benutzeranfragen und ruft die entsprechenden Services auf
 public class UserController implements RestController {
     private final UserService userService;
 
+    // Konstruktor, der eine Instanz von UserService initialisiert
     public UserController() {
         this.userService = new UserService();
     }
 
+    // Zentrale Methode zur Verarbeitung von HTTP-Anfragen
     @Override
     public Response handleRequest(Request request) {
-        try (UnitOfWork unitOfWork = new UnitOfWork()) {
-            UserRepositoryImpl userRepository = new UserRepositoryImpl(unitOfWork);
-
+        try {
             if (request.getMethod() == Method.POST) {
-                return processPostRequest(request, userRepository);
+                if (request.getPathname().equals("/users")) {
+                    return processPostUserRegistration(request);
+                } else if (request.getPathname().equals("/sessions")) {
+                    return processPostUserLogin(request);
+                }
             } else if (request.getMethod() == Method.GET) {
-                return processGetRequest(request, userRepository);
+                return processGetUser(request);
             } else if (request.getMethod() == Method.DELETE) {
-                return processDeleteRequest(request, userRepository);
+                return processDeleteUser(request);
             }
-            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Unsupported HTTP method\"}");
-        } catch (Exception ex) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
-        }
-    }
-    // POST-Handler - hier wird entweder ein neuer User registriert oder ein vorhandener User authentifiziert
-    private Response processPostRequest(Request request, UserRepositoryImpl userRepository) {
-        try {
-
-            //Body v Request wird zu einem UserObjekt umgewandel
-            ObjectMapper mapper = new ObjectMapper();
-            User inputUser = mapper.readValue(request.getBody(), User.class);
-
-            if (inputUser.getUsername() == null || inputUser.getUsername().isEmpty()) {
-                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Name is required\"}");
-            }
-
-            if (inputUser.getPassword() == null || inputUser.getPassword().isEmpty()) {
-                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Password is required\"}");
-            }
-
-            try {
-                // Schauen, ob der User schon existiert
-                User existingUser = userRepository.findByName(inputUser.getUsername());
-                if (existingUser != null) {
-                    //wenn er existiert SessionToken erstellt
-                    String sessionToken = userService.authenticateUser(inputUser.getUsername(), inputUser.getPassword());
-                    existingUser.setSessionToken(sessionToken);
-                    String jsonResponse = mapper.writeValueAsString(existingUser);
-                    return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-                }
-            } catch (IllegalArgumentException ex) {
-                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Invalid credentials\"}");
-            }
-
-            // Wenn der User nicht existiert, wird er registriert
-            userRepository.saveUser(inputUser);
-            return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"User successfully registered\"}");
-
-        } catch (SQLException sqlEx) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + sqlEx.getMessage() + "\"}");
-        } catch (JsonProcessingException jsonEx) {
-            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"" + jsonEx.getMessage() + "\"}");
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request\"}");
+        } catch (Exception e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
-    // GET-Handler - liefert eine Liste aller User zurück
-    private Response processGetRequest(Request request, UserRepositoryImpl userRepository) {
+    // POST - Benutzerregistrierung
+    private Response processPostUserRegistration(Request request) {
         try {
-            String pathname = request.getPathname();
-            String[] pathParts = pathname.split("/");
-
-            if (pathParts.length == 2) { // `/users` - Alle Benutzer abrufen
-                Collection<User> allUsers = userService.getAllUsers();
-                String jsonResponse = new ObjectMapper().writeValueAsString(allUsers);
-                return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-            } else if (pathParts.length == 3) { // `/users/{username}` - Einzelnen Benutzer abrufen
-                String username = pathParts[2];
-                User user = userService.getUserByName(username);
-                if (user != null) {
-                    String jsonResponse = new ObjectMapper().writeValueAsString(user);
-                    return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-                } else {
-                    return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"User not found\"}");
-                }
+            User user = new ObjectMapper().readValue(request.getBody(), User.class);
+            boolean success = userService.registerUser(user);
+            if (success) {
+                return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"User registered successfully\"}");
             } else {
-                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid URL format\"}");
+                return new Response(HttpStatus.CONFLICT, ContentType.JSON, "{\"error\": \"User already exists\"}");
             }
-        } catch (Exception ex) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
+        } catch (Exception e) {
+            return new Response(HttpStatus.CONFLICT, ContentType.JSON, "{\"error\": \"User already exists\"}");
         }
     }
 
-
-    private Response processDeleteRequest(Request request, UserRepositoryImpl userRepository) {
+    // POST - Benutzeranmeldung (Login)
+    private Response processPostUserLogin(Request request) {
         try {
-            String pathname = request.getPathname();
-            String[] pathParts = pathname.split("/");
-            int userId = Integer.parseInt(pathParts[pathParts.length - 1]); // Assuming URL is /users/{id}
-            userService.deleteUser(userId);
-            return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"User deleted successfully\"}");
-        } catch (SQLException sqlEx) {
-            // Fehler bei der Datenbank
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + sqlEx.getMessage() + "\"}");
-        } catch (NumberFormatException ex) {
-            // Fehlerhafte User-ID
+            User user = new ObjectMapper().readValue(request.getBody(), User.class);
+            String token = userService.authenticateUser(user.getUsername(), user.getPassword());
+            return new Response(HttpStatus.OK, ContentType.JSON, "{\"token\": \"" + token + "\"}");
+        } catch (JsonProcessingException e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid JSON format\"}");
+        } catch (IllegalArgumentException e) {
+            return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Invalid username or password\"}");
+        } catch (SQLException e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error\"}");
+        }
+    }
+
+    // GET - Abrufen von Benutzerdaten (Alle, per Username oder ID)
+    private Response processGetUser(Request request) {
+        String[] pathParts = request.getPathname().split("/");
+        try {
+            if (pathParts.length == 2) { // `/users` → Alle Benutzer abrufen
+                Collection<User> users = userService.getAllUsers();
+                String jsonResponse = new ObjectMapper().writeValueAsString(users);
+                return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+
+            } else if (pathParts.length == 3) {
+                String identifier = pathParts[2];
+
+                // Prüfen, ob identifier eine Zahl (ID) ist oder ein Username
+                if (identifier.matches("\\d+")) { // Falls es eine Zahl ist → User per ID abrufen
+                    int userId = Integer.parseInt(identifier);
+                    User user = userService.findUserById(userId);
+                    if (user != null) {
+                        String jsonResponse = new ObjectMapper().writeValueAsString(user);
+                        return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+                    } else {
+                        return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"User not found\"}");
+                    }
+
+                } else { // Falls es KEINE Zahl ist → User per Name abrufen
+                    User user = userService.findUserByName(identifier);
+                    if (user != null) {
+                        String jsonResponse = new ObjectMapper().writeValueAsString(user);
+                        return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+                    } else {
+                        return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"User not found\"}");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Error retrieving user\"}");
+        }
+        return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request format\"}");
+    }
+
+    // DELETE - Löschen eines Benutzers
+    private Response processDeleteUser(Request request) {
+        try {
+            String[] pathParts = request.getPathname().split("/");
+            if (pathParts.length == 3) {
+                int userId = Integer.parseInt(pathParts[2]);
+                userService.deleteUser(userId);
+                return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"User deleted successfully\"}");
+            } else {
+                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request format\"}");
+            }
+        } catch (NumberFormatException e) {
             return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid user ID\"}");
+        } catch (SQLException e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error\"}");
         }
     }
 }

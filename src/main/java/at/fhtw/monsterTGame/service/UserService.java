@@ -10,58 +10,70 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class UserService {
-    private final UserRepository userRepo;
+    private final UserRepository userRepository;
 
     public UserService() {
-        this.userRepo = new UserRepositoryImpl(new UnitOfWork());
+        this.userRepository = new UserRepositoryImpl(new UnitOfWork());
     }
-
-    public boolean addUser(User user) throws SQLException {
-        // Überprüfen, ob der Benutzername bereits existiert
-        if (userRepo.findByName(user.getUsername()) != null) {
-            throw new IllegalArgumentException("A user with this name already exists.");
+    //Benutzer registrieren
+    public boolean registerUser(User user) throws SQLException {
+        if (userRepository.findName(user.getUsername()) != null) {
+            //das mache ich damit Controller 409 zurückgibt
+            return false;
         }
-        return userRepo.saveUser(user);
+        return userRepository.saveUser(user);
     }
 
-    //falls sich der User einloggt updaten wir den User mit einem Session Token
-    public String authenticateUser(String name, String passwordHash) throws SQLException {
-        User existingUser = userRepo.findByName(name);
-        if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
-            throw new IllegalArgumentException("Invalid username or password.");
+
+    // Benutzer anhand des Namens abrufen
+    public User findUserByName(String username) throws SQLException {
+        return userRepository.findName(username);
+    }
+
+    // Benutzer anhand der ID abrufen
+    public User findUserById(int userId) throws SQLException {
+        return userRepository.findId(userId);
+    }
+
+    // Authentifizierung des Benutzers (Login)
+    public String authenticateUser(String username, String password) throws SQLException {
+        User existingUser = userRepository.findName(username);
+
+        if (existingUser == null || !existingUser.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Invalid username or password");
         }
-        String sessionToken = "authToken-" + UUID.randomUUID();
-        userRepo.updateTocken(name, sessionToken);
-        return sessionToken;
-    }
 
-    /*public String authenticateUser(String name, String passwordHash) throws SQLException {
-        // Benutzer anhand des Namens suchen
-        User existingUser = userRepo.findByName(name);
-        if (existingUser == null || !existingUser.getPassword().equals(passwordHash)) {
-            throw new IllegalArgumentException("Invalid username or password.");
+        // Token wird nur erzeugt, wenn der Benutzer noch keines hat
+        if (existingUser.getToken() == null || existingUser.getToken().isEmpty()) {
+            String sessionToken = "authToken-" + UUID.randomUUID();
+            existingUser.setToken(sessionToken);
+            userRepository.updateToken(username, sessionToken);
         }
-        // Generiere ein neues Session-Token
-        String sessionToken = "authToken-" + UUID.randomUUID();
-        userRepo.updateTocken(name, sessionToken);
-        return sessionToken;
-    }*/
 
-    public Collection<User> getAllUsers() throws SQLException, IllegalAccessException {
-        // Alle Benutzer abrufen
-        return userRepo.findAllUsers();
+        return existingUser.getToken();
     }
 
-    public User getUserByName(String name) throws SQLException {
-        // Benutzer anhand des Namens abrufen
-        return userRepo.findByName(name);
+
+    // Alle Benutzer abrufen
+    public Collection<User> getAllUsers() throws SQLException {
+        return userRepository.findAllUsers();
     }
+
+    // Benutzer anhand des Tokens abrufen
+    public User findUserByToken(String token) throws SQLException {
+        return userRepository.findToken(token);
+    }
+
+    // Benutzer löschen
     public void deleteUser(int userId) throws SQLException {
-        User user = userRepo.findById(userId); // Implementieren Sie findById Methode
+        User user = userRepository.findId(userId);
         if (user != null) {
-            userRepo.deleteUser(user);
+            userRepository.deleteUser(userId);
         } else {
             throw new IllegalArgumentException("User not found");
         }
     }
+
+
+
 }

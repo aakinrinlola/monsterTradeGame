@@ -4,16 +4,24 @@ public class User {
     private int userId;
     private String username;
     private String password;
-    private String sessionToken;
+    private String token;
 
     // Standard-Konstruktor
     public User() {}
 
-    // Konstruktor zur Initialisierung
+    // Konstruktor zur Initialisierung bzw Registrierung
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.sessionToken = null;
+        this.token = null;
+    }
+
+    //Konstruktor für Datenbankabfrage
+    public User(int userId, String username, String password, String token) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.token = token;
     }
 
     // Getter und Setter
@@ -41,11 +49,11 @@ public class User {
         this.password = password;
     }
 
-    public String getSessionToken() {
-        return sessionToken;
+    public String getToken() {
+        return token;
     }
 
-    public void setSessionToken(String sessionToken) {
-        this.sessionToken = sessionToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 }
