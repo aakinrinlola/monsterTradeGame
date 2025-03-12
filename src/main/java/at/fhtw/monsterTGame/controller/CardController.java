@@ -73,7 +73,7 @@ public class CardController implements RestController {
             int userId = extractUserIdFromToken(token);
             Cards card = new ObjectMapper().readValue(request.getBody(), Cards.class);
 
-            if (cardService.createCard(card, userId)) {
+            if (cardService.createCard(card)) {
                 return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"Card created successfully\"}");
             } else {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Failed to create card\"}");
@@ -92,7 +92,7 @@ public class CardController implements RestController {
 
             int userId = extractUserIdFromToken(token);
             if (request.getPathParts().size() > 1) {
-                int cardId = Integer.parseInt(request.getPathParts().get(1));
+                String cardId = request.getPathParts().get(1);
 
                 if (cardService.deleteCard(cardId, userId)) {
                     return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Card deleted successfully\"}");

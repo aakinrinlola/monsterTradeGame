@@ -34,6 +34,9 @@ public class UserController implements RestController {
                     return processPostUserLogin(request);
                 }
             } else if (request.getMethod() == Method.GET) {
+                if (request.getPathname().equals("/users/me")) {
+                    return processGetUserByToken(request); // <-- Hier neue Methode einfügen!
+                }
                 return processGetUser(request);
             } else if (request.getMethod() == Method.DELETE) {
                 return processDeleteUser(request);
@@ -43,6 +46,7 @@ public class UserController implements RestController {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
+
 
     // POST - Benutzerregistrierung
     private Response processPostUserRegistration(Request request) {
@@ -112,6 +116,31 @@ public class UserController implements RestController {
         }
         return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request format\"}");
     }
+    // GET - Benutzer anhand des Tokens abrufen
+    private Response processGetUserByToken(Request request) {
+        try {
+            // Token aus Header extrahieren
+            String token = request.getHeader("Authorization");
+            if (token == null || !token.startsWith("Bearer ")) {
+                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing or invalid Authorization header\"}");
+            }
+            token = token.replace("Bearer ", "").trim();
+
+            // Benutzer anhand des Tokens abrufen
+            User user = userService.findUserByToken(token);
+            if (user == null) {
+                return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"User not found for this token\"}");
+            }
+
+            // Benutzer als JSON zurückgeben
+            String jsonResponse = new ObjectMapper().writeValueAsString(user);
+            return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+
+        } catch (Exception e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Error retrieving user\"}");
+        }
+    }
+
 
     // DELETE - Löschen eines Benutzers
     private Response processDeleteUser(Request request) {

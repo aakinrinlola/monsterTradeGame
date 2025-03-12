@@ -15,32 +15,36 @@ public class CardService {
         this.cardRepo = new CardRepositoryImpl(new UnitOfWork());
     }
 
-    //Erstellt eine neue Karte und ordnet sie einem Benutzer zu
-    public boolean createCard(Cards card, int userId) throws SQLException {
+    // Erstellt eine Karte ohne Besitzer (z. B. für ein Paket)
+    public boolean createCard(Cards card) throws SQLException {
         if (card.getName() == null || card.getName().isEmpty()) {
             throw new IllegalArgumentException("Card name cannot be null or empty");
         }
-        card.setUserId(userId); // Karte dem Benutzer zuweisen
         return cardRepo.save(card);
     }
 
-    //Ruft alle Karten für einen bestimmten Benutzer ab
+    // Ordnet eine existierende Karte einem Benutzer zu
+    public boolean assignCardToUser(String cardId, int userId) throws SQLException {
+        return cardRepo.assignCardToUser(String.valueOf(cardId), userId);
+    }
+
+    // Ruft alle Karten eines bestimmten Benutzers ab
     public Collection<Cards> getCardsByUserId(int userId) throws SQLException {
         return cardRepo.findCardsByUserId(userId);
     }
 
-    //Löscht eine Karte, falls sie dem Benutzer gehört
-    public boolean deleteCard(int cardId, int userId) throws SQLException {
+    // Löscht eine Karte, falls sie dem Benutzer gehört
+    public boolean deleteCard(String cardId, int userId) throws SQLException {
         Collection<Cards> userCards = getCardsByUserId(userId);
 
         boolean cardExists = userCards.stream()
-                .anyMatch(card -> card.getCardId().equals(String.valueOf(cardId)));
+                .anyMatch(card -> card.getCardId().equals(cardId)); // String-Vergleich mit equals()
 
         if (!cardExists) {
             throw new IllegalArgumentException("User does not own this card.");
         }
 
-        return cardRepo.delete(String.valueOf(cardId));
+        return cardRepo.delete(cardId); // String statt int
     }
 
 }
