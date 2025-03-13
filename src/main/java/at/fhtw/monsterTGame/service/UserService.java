@@ -7,6 +7,7 @@ import at.fhtw.monsterTGame.persistence.repository.UserRepositoryImpl;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public class UserService {
@@ -15,15 +16,14 @@ public class UserService {
     public UserService() {
         this.userRepository = new UserRepositoryImpl(new UnitOfWork());
     }
-    //Benutzer registrieren
+
+    // Benutzer registrieren
     public boolean registerUser(User user) throws SQLException {
         if (userRepository.findName(user.getUsername()) != null) {
-            //das mache ich damit Controller 409 zurückgibt
-            return false;
+            return false; // Damit Controller 409 zurückgibt
         }
         return userRepository.saveUser(user);
     }
-
 
     // Benutzer anhand des Namens abrufen
     public User findUserByName(String username) throws SQLException {
@@ -53,7 +53,6 @@ public class UserService {
         return existingUser.getToken();
     }
 
-
     // Alle Benutzer abrufen
     public Collection<User> getAllUsers() throws SQLException {
         return userRepository.findAllUsers();
@@ -74,6 +73,23 @@ public class UserService {
         }
     }
 
+    // Leaderboard abrufen (Spieler nach ELO sortiert)
+    public List<User> getScoreboard() throws SQLException {
+        return userRepository.getUsersSortedByELO();
+    }
 
+    // ELO und gespielte Spiele eines Spielers aktualisieren
+    public void updateELOAndGamesPlayed(int userId, int eloChange) throws SQLException {
+        userRepository.updateELOAndGamesPlayed(userId, eloChange);
+    }
 
+    // Coins für einen Spieler aktualisieren
+    public void updateCoins(int userId, int coins) throws SQLException {
+        userRepository.updateCoinsForExtraPrice(userId, coins);
+    }
+
+    // Gewinn- und Verluststatistik eines Spielers aktualisieren
+    public void updateWinLossRecord(int userId, boolean won, boolean draw) throws SQLException {
+        userRepository.updateWinLossRecord(userId, won, draw);
+    }
 }

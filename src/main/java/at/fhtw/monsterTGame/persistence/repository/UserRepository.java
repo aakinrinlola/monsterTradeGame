@@ -4,6 +4,7 @@ import at.fhtw.monsterTGame.model.User;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 public interface UserRepository {
     // Sucht einen Benutzer nach seinem Benutzernamen
@@ -38,4 +39,19 @@ public interface UserRepository {
 
     // Aktualisiert die Gewinn- und Verluststatistik eines Benutzers
     void updateWinLossRecord(int userId, boolean won, boolean draw) throws SQLException;
+
+    // Holt eine Liste der Benutzer sortiert nach ELO für das Leaderboard
+    List<User> getUsersSortedByELO() throws SQLException;
+
+    // Erhöht die Anzahl der gespielten Spiele für einen Benutzer
+    void incrementGamesPlayed(int userId) throws SQLException;
+
+    // Holt die aktuelle Anzahl der Siege eines Benutzers
+    int getUserWins(int userId) throws SQLException;
+
+    // Holt die aktuelle Anzahl der Niederlagen eines Benutzers
+    int getUserLosses(int userId) throws SQLException;
+
+    // Holt die aktuelle Anzahl der Unentschieden eines Benutzers
+    int getUserDraws(int userId) throws SQLException;
 }

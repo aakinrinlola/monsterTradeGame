@@ -2,8 +2,7 @@ package at.fhtw;
 
 import at.fhtw.httpserver.server.Server;
 import at.fhtw.httpserver.utils.Router;
-import at.fhtw.monsterTGame.controller.CardController;
-import at.fhtw.monsterTGame.controller.UserController;
+import at.fhtw.monsterTGame.controller.*;
 import at.fhtw.sampleapp.controller.EchoController;
 import at.fhtw.sampleapp.controller.WeatherController;
 
@@ -24,7 +23,14 @@ public class Main {
         Router router = new Router();
         router.addService("/users", new UserController());
         router.addService("/cards", new CardController());
-        router.addService("/sessions", new UserController());
+        router.addService("/sessions", new AuthSessionController());
+        router.addService("/battles", new BattleController());
+        router.addService("/decks", new DeckController());
+        router.addService("/packages", new PackageController());
+        router.addService("/scoreboard", new LeaderboardController());
+        router.addService("/stats", new PlayerStatsController());
+        router.addService("/transaction", new PaymentController());
+
 
         return router;
     }
