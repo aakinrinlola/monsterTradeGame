@@ -92,4 +92,8 @@ public class UserService {
     public void updateWinLossRecord(int userId, boolean won, boolean draw) throws SQLException {
         userRepository.updateWinLossRecord(userId, won, draw);
     }
+    public boolean isValidToken(String token) throws SQLException {
+        User user = userRepository.findToken(token);
+        return user != null; // Falls der Token existiert, ist er gültig
+    }
 }

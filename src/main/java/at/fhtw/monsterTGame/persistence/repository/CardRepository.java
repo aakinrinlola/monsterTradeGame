@@ -18,4 +18,5 @@ public interface CardRepository {
     List<Cards> findCardsByIds(List<String> cardIds, Integer userId) throws SQLException; // id als String
 
     boolean updateCardUser(String cardId, Integer newUserId) throws SQLException;
+
 }

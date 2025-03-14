@@ -64,6 +64,12 @@ public class CardRepositoryImpl implements CardRepository {
 
     @Override
     public boolean save(Cards card) throws SQLException {
+
+        if (cardExists(card.getCardId())) {
+            System.out.println("Karte existiert bereits, aktualisiere Besitzer: " + card.getCardId());
+            return assignCardToUser(card.getCardId(), card.getUserId()); // Besitzer zuweisen
+        }
+
         String sql = "INSERT INTO cards (card_id, name, damage, element_type, category, user_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, card.getCardId());  // Ensure card.getCardId() is not null
@@ -180,4 +186,19 @@ public class CardRepositoryImpl implements CardRepository {
             return result;
         }
     }
+    public boolean cardExists(String cardId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM cards WHERE card_id = ?";
+        try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
+            statement.setString(1, cardId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+
+
+
 }

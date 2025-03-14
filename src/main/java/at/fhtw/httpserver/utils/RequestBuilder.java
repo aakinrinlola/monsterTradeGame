@@ -18,37 +18,44 @@ public class RequestBuilder {
             request.setMethod(getMethod(splitFirstLine[0]));
             setPathname(request, splitFirstLine[1]);
 
-            line = bufferedReader.readLine();
-            while (!line.isEmpty()) {
-                request.getHeaderMap().ingest(line);
-                line = bufferedReader.readLine();
+            // Header einlesen
+            while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) {
+                parseHeader(request, line);
             }
 
-            if (request.getHeaderMap().getContentLength() > 0) {
-                char[] charBuffer = new char[request.getHeaderMap().getContentLength()];
-                bufferedReader.read(charBuffer, 0, request.getHeaderMap().getContentLength());
-
-                request.setBody(new String(charBuffer));
+            // Body einlesen, falls vorhanden
+            if (request.getHeader("Content-Length") != null) {
+                int contentLength = Integer.parseInt(request.getHeader("Content-Length"));
+                if (contentLength > 0) {
+                    char[] charBuffer = new char[contentLength];
+                    bufferedReader.read(charBuffer, 0, contentLength);
+                    request.setBody(new String(charBuffer));
+                }
             }
         }
 
         return request;
     }
 
+    private void parseHeader(Request request, String line) {
+        String[] parts = line.split(": ", 2);
+        if (parts.length == 2) {
+            request.addHeader(parts[0].trim(), parts[1].trim());
+        }
+    }
+
     private Method getMethod(String methodString) {
         return Method.valueOf(methodString.toUpperCase(Locale.ROOT));
     }
 
-    private void setPathname(Request request, String path){
-        Boolean hasParams = path.indexOf("?") != -1;
+    private void setPathname(Request request, String path) {
+        boolean hasParams = path.contains("?");
 
         if (hasParams) {
-            String[] pathParts =  path.split("\\?");
+            String[] pathParts = path.split("\\?");
             request.setPathname(pathParts[0]);
             request.setParams(pathParts[1]);
-        }
-        else
-        {
+        } else {
             request.setPathname(path);
             request.setParams(null);
         }

@@ -13,34 +13,29 @@ public class Request {
     private String pathname;
     private List<String> pathParts;
     private String params;
-    private HeaderMap headerMap =  new HeaderMap();
     private String body;
     private Map<String, String> headers = new HashMap<>();
 
-    public String getServiceRoute(){
-        if (this.pathParts == null ||
-                this.pathParts.isEmpty()) {
+    public String getServiceRoute() {
+        if (this.pathParts == null || this.pathParts.isEmpty()) {
             return null;
         }
-
         return '/' + this.pathParts.get(0);
     }
 
-    public String getUrlContent(){
+    public String getUrlContent() {
         return this.urlContent;
     }
 
     public void setUrlContent(String urlContent) {
         this.urlContent = urlContent;
-        Boolean hasParams = urlContent.indexOf("?") != -1;
+        boolean hasParams = urlContent.contains("?");
 
         if (hasParams) {
-            String[] pathParts =  urlContent.split("\\?");
+            String[] pathParts = urlContent.split("\\?");
             this.setPathname(pathParts[0]);
             this.setParams(pathParts[1]);
-        }
-        else
-        {
+        } else {
             this.setPathname(urlContent);
             this.setParams(null);
         }
@@ -58,35 +53,23 @@ public class Request {
         return pathname;
     }
 
-
     public void setPathname(String pathname) {
         this.pathname = pathname;
         String[] stringParts = pathname.split("/");
         this.pathParts = new ArrayList<>();
-        for (String part :stringParts)
-        {
-            if (part != null &&
-                    part.length() > 0)
-            {
+        for (String part : stringParts) {
+            if (part != null && part.length() > 0) {
                 this.pathParts.add(part);
             }
         }
-
     }
+
     public String getParams() {
         return params;
     }
 
     public void setParams(String params) {
         this.params = params;
-    }
-
-    public HeaderMap getHeaderMap() {
-        return headerMap;
-    }
-
-    public void setHeaderMap(HeaderMap headerMap) {
-        this.headerMap = headerMap;
     }
 
     public String getBody() {
@@ -106,19 +89,32 @@ public class Request {
     }
 
     public String getHeader(String headerName) {
-        if (this.headers != null && this.headers.containsKey(headerName)) {
-            return this.headers.get(headerName);
+        for (String key : headers.keySet()) {
+            if (key.equalsIgnoreCase(headerName)) {  // Case-Insensitive Vergleich
+                return headers.get(key);
+            }
         }
-        return null; // Header existiert nicht
+        return null;
     }
+
     public void parseHeaders(String rawHeaders) {
+        System.out.println("Empfangene Header-Rohdaten:\n" + rawHeaders);
+
         String[] lines = rawHeaders.split("\r\n");
         for (String line : lines) {
             String[] parts = line.split(": ", 2);
             if (parts.length == 2) {
-                this.headers.put(parts[0], parts[1]);
+                headers.put(parts[0].trim(), parts[1].trim());
             }
         }
-    }
 
+        // Debugging: Zeigt alle geparsten Header
+        System.out.println("Geparste Header:");
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
+    }
 }

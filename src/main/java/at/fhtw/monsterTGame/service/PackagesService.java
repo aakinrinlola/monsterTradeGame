@@ -4,6 +4,7 @@ import at.fhtw.monsterTGame.model.Cards;
 import at.fhtw.monsterTGame.persistence.repository.*;
 import at.fhtw.monsterTGame.persistence.UnitOfWork;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import at.fhtw.monsterTGame.model.User;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -38,37 +39,29 @@ public class PackagesService {
 
     // Kauft ein Paket und weist Karten einem Benutzer zu
     public List<Cards> buyPackage(String authToken) throws SQLException {
-        // Abrufen der aktuellen Coins des Benutzers
-        int coins = packagesRepository.getCoinsByToken(authToken);
+        User user = userRepository.findToken(authToken);
+        if (user == null) {
+            throw new IllegalArgumentException("Invalid token or user not found.");
+        }
 
-        // Überprüfen, ob der Benutzer genug Coins hat, um ein Paket zu kaufen
+        int coins = user.getCoins();
         if (coins < 5) {
             throw new IllegalArgumentException("Not enough coins to buy a package.");
         }
 
-        // Abrufen der ID eines verfügbaren Pakets
         int packageId = packagesRepository.getFreePackageID();
         if (packageId == -1) {
             throw new IllegalStateException("No packages available for purchase.");
         }
 
-        // Abrufen der Karten des gewählten Pakets
         List<Cards> cards = packagesRepository.getCardsPackageId(packageId);
-
-        // Ermitteln der Benutzer-ID anhand des Authentifizierungstokens
-        int userId = userRepository.findUserIdByToken(authToken);
-
-        // Karten dem Benutzer zuweisen und speichern
         for (Cards card : cards) {
-            card.setUserId(userId);
+            card.setUserId(user.getUserId());
             cardRepository.save(card);
         }
 
-        // Aktualisieren der Benutzer-Coins nach dem Kauf
-        userService.updateCoins(userId, -5);
-
-        // Markieren des Pakets als verkauft und Zuweisung an den Benutzer
-        packagesRepository.setPackageAsSold(packageId, userId);
+        userService.updateCoins(user.getUserId(), -5);
+        packagesRepository.setPackageAsSold(packageId, user.getUserId());
 
         return cards;
     }
@@ -88,4 +81,5 @@ public class PackagesService {
         }
         return result;
     }
+
 }

@@ -80,6 +80,7 @@ public class PackageController implements RestController {
 
     private String extractToken(Request request) {
         String token = request.getHeader("Authorization");
+        System.out.println("PackageControllerHeader: " + token);
         return (token != null && token.startsWith("Bearer ")) ? token.replace("Bearer ", "").trim() : null;
     }
 

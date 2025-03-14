@@ -6,7 +6,7 @@
 
 USERNAME="kienboec"
 PASSWORD="daniel"
-TOKEN="kienboec-mtcgToken"
+TOKEN="authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 
 echo "CURL Testing for Monster Trading Cards Game"
 echo "Syntax: MonsterTradingCards.sh [pause]"
@@ -143,20 +143,23 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "4) acquire packages kienboec"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" --data '{ "id": "1" }'
+curl -i -X POST http://localhost:10001/transactions/packages \
+  --header "Content-Type: application/json" \
+  --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" \
+  -d '{}'
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d ""
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d ""
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d ""
 echo "Should return HTTP 201"
 echo .
 echo "should fail (no money):"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d ""
 echo "Should return HTTP 4xx - Not enough money"
 echo .
 echo .
@@ -165,14 +168,14 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "5) acquire packages altenhof"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 201"
 echo .
 echo "should fail (no package):"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 4xx - No packages available"
 echo .
 echo .

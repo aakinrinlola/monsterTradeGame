@@ -155,18 +155,27 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public int findUserIdByToken(String authToken) throws SQLException {
+        System.out.println("Token in der Datenbank suchen: " + authToken); // DEBUG
+
         String sql = "SELECT userid FROM users WHERE token = ?";
         try (PreparedStatement statement = this.unitOfWork.prepareStatement(sql)) {
             statement.setString(1, authToken);
             ResultSet resultSet = statement.executeQuery();
+
             if (resultSet.next()) {
-                return resultSet.getInt("userid");
+                int userId = resultSet.getInt("userid");
+                System.out.println("Gefundene User-ID: " + userId); // DEBUG
+                return userId;
+            } else {
+                System.out.println("Kein User für Token gefunden."); // DEBUG
             }
         } catch (SQLException e) {
-            throw new SQLException("Error finding user ID by token", e);
+            throw new SQLException("Fehler bei der Token-Suche", e);
         }
-        return -1; // Falls kein User gefunden wurde
+        return -1;
     }
+
+
 
     @Override
     public void updateELOAndGamesPlayed(int userId, int eloChange) throws SQLException {
