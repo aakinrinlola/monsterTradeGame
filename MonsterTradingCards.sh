@@ -374,7 +374,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "17) battle"
-curl -i -X POST http://localhost:10001/battles --header "Authorization: authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" &
+curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" &
 curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" &
 wait
 

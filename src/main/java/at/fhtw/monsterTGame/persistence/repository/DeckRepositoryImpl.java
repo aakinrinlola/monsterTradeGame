@@ -48,8 +48,10 @@ public class DeckRepositoryImpl implements DeckRepository {
                 return new Deck(resultSet.getInt("id"), userId, cards);
             }
         }
-        return null;
+        // Statt `null`, gib ein leeres Deck zurück
+        return new Deck(0, userId, new ArrayList<>());
     }
+
 
     @Override
     public boolean updateDeck(int userId, Deck deck) throws SQLException {
