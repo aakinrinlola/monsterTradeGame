@@ -25,12 +25,12 @@ public class Main {
         router.addService("/cards", new CardController());
         router.addService("/sessions", new AuthSessionController());
         router.addService("/battles", new BattleController());
-        router.addService("/decks", new DeckController());
+        router.addService("/deck", new DeckController());
         router.addService("/packages", new PackageController());
         router.addService("/scoreboard", new LeaderboardController());
         router.addService("/stats", new PlayerStatsController());
-        router.addService("/transaction", new PaymentController());
-
+        router.addService("/transactions", new PaymentController());
+        router.addService("/transactions/packages", new PaymentController());
 
         return router;
     }

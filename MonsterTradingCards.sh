@@ -74,23 +74,68 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "3) create packages (done by admin)"
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"Name\":\"WaterGoblin\", \"Damage\": 10.0}, {\"Id\":\"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"Name\":\"Dragon\", \"Damage\": 50.0}, {\"Id\":\"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"Name\":\"WaterSpell\", \"Damage\": 20.0}, {\"Id\":\"1cb6ab86-bdb2-47e5-b6e4-68c5ab389334\", \"Name\":\"Ork\", \"Damage\": 45.0}, {\"Id\":\"dfdd758f-649c-40f9-ba3a-8657f4b3439f\", \"Name\":\"FireSpell\",    \"Damage\": 25.0}]"
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{
+  "name": "ExamplePackage",
+  "cards": [
+    {
+      "card_id": "644808c2-f87a-4600-b313-122b02322fd5",
+      "name": "WaterGoblin",
+      "damage": 9.0,
+      "element_type": "WATER",
+      "category": "MONSTER",
+      "user_id": 1
+    },
+    {
+      "card_id": "4a2757d6-b1c3-47ac-b9a3-91deab093531",
+      "name": "Dragon",
+      "damage": 55.0,
+      "element_type": "FIRE",
+      "category": "MONSTER",
+      "user_id": 1
+    },
+    {
+      "card_id": "91a6471b-1426-43f6-ad65-6fc473e16f9f",
+      "name": "WaterSpell",
+      "damage": 21.0,
+      "element_type": "WATER",
+      "category": "SPELL",
+      "user_id": 1
+    },
+    {
+      "card_id": "4ec8b269-0dfa-4f97-809a-2c63fe2a0025",
+      "name": "Ork",
+      "damage": 55.0,
+      "element_type": "GRASS",
+      "category": "MONSTER",
+      "user_id": 1
+    },
+    {
+      "card_id": "f8043c23-1534-4487-b66b-238e0c3c39b5",
+      "name": "WaterSpell",
+      "damage": 23.0,
+      "element_type": "WATER",
+      "category": "SPELL",
+      "user_id": 1
+    }
+  ]
+}'
+
 echo "Should return HTTP 201"
 echo .																																																																																		 				    
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"644808c2-f87a-4600-b313-122b02322fd5\", \"Name\":\"WaterGoblin\", \"Damage\":  9.0}, {\"Id\":\"4a2757d6-b1c3-47ac-b9a3-91deab093531\", \"Name\":\"Dragon\", \"Damage\": 55.0}, {\"Id\":\"91a6471b-1426-43f6-ad65-6fc473e16f9f\", \"Name\":\"WaterSpell\", \"Damage\": 21.0}, {\"Id\":\"4ec8b269-0dfa-4f97-809a-2c63fe2a0025\", \"Name\":\"Ork\", \"Damage\": 55.0}, {\"Id\":\"f8043c23-1534-4487-b66b-238e0c3c39b5\", \"Name\":\"WaterSpell\",   \"Damage\": 23.0}]"
-echo "Should return HTTP 201"
-echo .																																																																																		 				    
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"b017ee50-1c14-44e2-bfd6-2c0c5653a37c\", \"Name\":\"WaterGoblin\", \"Damage\": 11.0}, {\"Id\":\"d04b736a-e874-4137-b191-638e0ff3b4e7\", \"Name\":\"Dragon\", \"Damage\": 70.0}, {\"Id\":\"88221cfe-1f84-41b9-8152-8e36c6a354de\", \"Name\":\"WaterSpell\", \"Damage\": 22.0}, {\"Id\":\"1d3f175b-c067-4359-989d-96562bfa382c\", \"Name\":\"Ork\", \"Damage\": 40.0}, {\"Id\":\"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\", \"Name\":\"RegularSpell\", \"Damage\": 28.0}]"
-echo "Should return HTTP 201"
-echo .																																																																																		 				    
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"ed1dc1bc-f0aa-4a0c-8d43-1402189b33c8\", \"Name\":\"WaterGoblin\", \"Damage\": 10.0}, {\"Id\":\"65ff5f23-1e70-4b79-b3bd-f6eb679dd3b5\", \"Name\":\"Dragon\", \"Damage\": 50.0}, {\"Id\":\"55ef46c4-016c-4168-bc43-6b9b1e86414f\", \"Name\":\"WaterSpell\", \"Damage\": 20.0}, {\"Id\":\"f3fad0f2-a1af-45df-b80d-2e48825773d9\", \"Name\":\"Ork\", \"Damage\": 45.0}, {\"Id\":\"8c20639d-6400-4534-bd0f-ae563f11f57a\", \"Name\":\"WaterSpell\",   \"Damage\": 25.0}]"
-echo "Should return HTTP 201"
-echo .																																																																																		 				    
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"d7d0cb94-2cbf-4f97-8ccf-9933dc5354b8\", \"Name\":\"WaterGoblin\", \"Damage\":  9.0}, {\"Id\":\"44c82fbc-ef6d-44ab-8c7a-9fb19a0e7c6e\", \"Name\":\"Dragon\", \"Damage\": 55.0}, {\"Id\":\"2c98cd06-518b-464c-b911-8d787216cddd\", \"Name\":\"WaterSpell\", \"Damage\": 21.0}, {\"Id\":\"951e886a-0fbf-425d-8df5-af2ee4830d85\", \"Name\":\"Ork\", \"Damage\": 55.0}, {\"Id\":\"dcd93250-25a7-4dca-85da-cad2789f7198\", \"Name\":\"FireSpell\",    \"Damage\": 23.0}]"
-echo "Should return HTTP 201"
-echo .																																																																																		 				    
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"b2237eca-0271-43bd-87f6-b22f70d42ca4\", \"Name\":\"WaterGoblin\", \"Damage\": 11.0}, {\"Id\":\"9e8238a4-8a7a-487f-9f7d-a8c97899eb48\", \"Name\":\"Dragon\", \"Damage\": 70.0}, {\"Id\":\"d60e23cf-2238-4d49-844f-c7589ee5342e\", \"Name\":\"WaterSpell\", \"Damage\": 22.0}, {\"Id\":\"fc305a7a-36f7-4d30-ad27-462ca0445649\", \"Name\":\"Ork\", \"Damage\": 40.0}, {\"Id\":\"84d276ee-21ec-4171-a509-c1b88162831c\", \"Name\":\"RegularSpell\", \"Damage\": 28.0}]"
-echo "Should return HTTP 201"
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage1", "cards": [ { "card_id": "7a1d7b5e-3b34-4a31-9e9d-1a7d8e9b7f51", "name": "WaterGoblin", "damage": 12.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "6e2b7f53-9b4a-4c6a-8f5a-1b2d2e8b1c71", "name": "Dragon", "damage": 60.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "4c3f7e34-8d5a-4a6e-9f2a-1c3d3e8b2b81", "name": "WaterSpell", "damage": 24.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "5b4d8f56-1a2b-4b6a-9e3a-1d4d4f8b3c91", "name": "Ork", "damage": 50.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "3d5e9a67-2b3c-4c7a-9f4a-1e5e5f9b4d01", "name": "FireSpell", "damage": 26.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
+echo "Should return HTTP 201"; 
+echo .
+
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage2", "cards": [ { "card_id": "8b2e8c78-4c5d-5a8b-9f6b-2e6e6f9b5e11", "name": "WaterGoblin", "damage": 13.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "7f3d9f89-5d6e-6b9c-9e7c-2f7f7f9b6f21", "name": "Dragon", "damage": 65.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "5d4f8f90-6e7f-7c9d-9f8d-2g8g8f9b7g31", "name": "WaterSpell", "damage": 25.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "6e5g9g01-7f8g-8d9e-9g9e-2h9h9f9b8h41", "name": "Ork", "damage": 55.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "4f6h0h12-8g9h-9e0f-9h0f-2i0i0f9b9i51", "name": "FireSpell", "damage": 27.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
+echo "Should return HTTP 201"; 
+echo .
+
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage3", "cards": [ { "card_id": "9c3f9d89-5d6f-7e9c-9f7c-3i0i0f9b0j61", "name": "WaterGoblin", "damage": 14.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "8g4h0g90-6e8h-8f0d-0g8d-3j1j1f9b1k71", "name": "Dragon", "damage": 70.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "6h5i0i01-7f9i-9g0e-0h9e-3k2k2f9b2l81", "name": "WaterSpell", "damage": 26.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "7i6j1j12-8g0j-0h1f-0i0f-3l3l3f9b3m91", "name": "Ork", "damage": 60.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "5j7k2k23-9h1k-1i2g-1j1g-3m4m4f9b4n01", "name": "FireSpell", "damage": 28.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
+echo "Should return HTTP 201"; 
+echo .
+
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage4", "cards": [ { "card_id": "0j8l3l34-ae2l-2j3h-2k2h-4n5n5f9b5o11", "name": "WaterGoblin", "damage": 15.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "9k1m4m45-bf3m-3k4i-3l3i-4o6o6f9b6p21", "name": "Dragon", "damage": 75.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "7l2n5n56-cg4n-4l5j-4m4j-4p7p7f9b7q31", "name": "WaterSpell", "damage": 27.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "8m3o6o67-dh5o-5m6k-5n5k-4q8q8f9b8r41", "name": "Ork", "damage": 65.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "6n4p7p78-ei6p-6n7l-6o6l-4r9r9f9b9s51", "name": "FireSpell", "damage": 29.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
+echo "Should return HTTP 201"; 
 echo .
 echo .
 
@@ -98,7 +143,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "4) acquire packages kienboec"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" --data '{ "id": "1" }'
 echo "Should return HTTP 201"
 echo .
 curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d ""

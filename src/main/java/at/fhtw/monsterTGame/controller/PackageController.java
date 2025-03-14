@@ -28,9 +28,12 @@ public class PackageController implements RestController {
         try {
             switch (request.getMethod()) {
                 case POST:
-                    return handleCreatePackage(request);
+                    if (request.getPathname().equals("/transactions/packages")) {
+                        return handleBuyPackage(request);  // Paket kaufen
+                    }
+                    return handleCreatePackage(request);  // Neues Paket erstellen
                 case GET:
-                    return handleRetrievePackages(request);
+                    return handleRetrievePackages(request);  // Pakete abrufen
                 default:
                     return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request method\"}");
             }
@@ -38,6 +41,7 @@ public class PackageController implements RestController {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
+
 
     private Response handleCreatePackage(Request request) throws JsonProcessingException, SQLException {
         Map<String, Object> requestBody = new ObjectMapper().readValue(request.getBody(), Map.class);
@@ -77,5 +81,27 @@ public class PackageController implements RestController {
     private String extractToken(Request request) {
         String token = request.getHeader("Authorization");
         return (token != null && token.startsWith("Bearer ")) ? token.replace("Bearer ", "").trim() : null;
+    }
+
+    private Response handleBuyPackage(Request request) throws SQLException {
+        String token = extractToken(request);
+        if (token == null) {
+            return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing or invalid token\"}");
+        }
+
+        try {
+            List<Cards> purchasedCards = packagesService.buyPackage(token);
+
+            String jsonResponse = new ObjectMapper().writeValueAsString(Map.of(
+                    "message", "Package successfully purchased",
+                    "cards", purchasedCards
+            ));
+
+            return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

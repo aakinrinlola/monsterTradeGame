@@ -89,20 +89,29 @@ public class PackagesRepositoryImpl implements PackagesRepository {
 
     @Override
     public boolean addNewPackage(String packageName, List<Cards> cards) throws SQLException {
-        String sql = "INSERT INTO packages (name, is_sold, cards) VALUES (?, FALSE, ?::jsonb)";
+        if (packageName == null || packageName.trim().isEmpty()) {
+            throw new SQLException("Package name cannot be null or empty");
+        }
+
+        String sql = "INSERT INTO packages (name, is_sold, cards, user_id) VALUES (?, FALSE, ?::jsonb, NULL)";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, packageName);
             String cardsJson = new ObjectMapper().writeValueAsString(cards);
             statement.setString(2, cardsJson);
 
             boolean result = statement.executeUpdate() > 0;
-            unitOfWork.commitTransaction();
+            if (result) {
+                unitOfWork.commitTransaction();
+            } else {
+                unitOfWork.rollbackTransaction();
+            }
             return result;
+
         } catch (SQLException e) {
             unitOfWork.rollbackTransaction();
             throw e;
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error serializing cards JSON", e);
         }
     }
 

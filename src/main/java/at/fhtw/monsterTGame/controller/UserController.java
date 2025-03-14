@@ -33,6 +33,18 @@ public class UserController implements RestController {
             if (method == Method.GET && path.equals("/users/me")) {
                 return processGetUserByToken(request);
             }
+            if (method == Method.GET && path.equals("/users/me")) {
+                return processGetUserByToken(request);
+            }
+            if (method == Method.PATCH && path.equals("/users/elo")) {
+                return processUpdateELO(request);
+            }
+            if (method == Method.PATCH && path.equals("/users/coins")) {
+                return processUpdateCoins(request);
+            }
+            if (method == Method.PATCH && path.equals("/users/stats")) {
+                return processUpdateWinLossRecord(request);
+            }
             if (method == Method.GET) {
                 return processGetUser(request);
             }
@@ -142,6 +154,48 @@ public class UserController implements RestController {
         } catch (SQLException e) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON,
                     "{\"error\": \"Database error\"}");
+        }
+    }
+    private Response processUpdateELO(Request request) {
+        try {
+            Map<String, Object> requestBody = new ObjectMapper().readValue(request.getBody(), Map.class);
+            int userId = (int) requestBody.get("userId");
+            int eloChange = (int) requestBody.get("eloChange");
+
+            userService.updateELOAndGamesPlayed(userId, eloChange);
+            return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"ELO and games played updated\"}");
+
+        } catch (Exception e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request data\"}");
+        }
+    }
+
+    private Response processUpdateCoins(Request request) {
+        try {
+            Map<String, Object> requestBody = new ObjectMapper().readValue(request.getBody(), Map.class);
+            int userId = (int) requestBody.get("userId");
+            int coins = (int) requestBody.get("coins");
+
+            userService.updateCoins(userId, coins);
+            return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Coins updated\"}");
+
+        } catch (Exception e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request data\"}");
+        }
+    }
+
+    private Response processUpdateWinLossRecord(Request request) {
+        try {
+            Map<String, Object> requestBody = new ObjectMapper().readValue(request.getBody(), Map.class);
+            int userId = (int) requestBody.get("userId");
+            boolean won = (boolean) requestBody.get("won");
+            boolean draw = (boolean) requestBody.get("draw");
+
+            userService.updateWinLossRecord(userId, won, draw);
+            return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Win/Loss record updated\"}");
+
+        } catch (Exception e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request data\"}");
         }
     }
 

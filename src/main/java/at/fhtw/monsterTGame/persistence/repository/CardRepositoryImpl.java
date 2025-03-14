@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class CardRepositoryImpl implements CardRepository {
     private final UnitOfWork unitOfWork;
@@ -21,17 +22,17 @@ public class CardRepositoryImpl implements CardRepository {
 
     @Override
     public Cards findById(String id) throws SQLException {
-        String sql = "SELECT * FROM cards WHERE id = ?";
+        String sql = "SELECT * FROM cards WHERE card_id = ?";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, id);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 return new Cards(
-                        resultSet.getString("id"),
+                        resultSet.getString("card_id"),
                         resultSet.getString("name"),
-                        ElementTypeEnum.valueOf(resultSet.getString("element")),
-                        CardTypeEnum.valueOf(resultSet.getString("type")),
+                        ElementTypeEnum.valueOf(resultSet.getString("element_type")),
+                        CardTypeEnum.valueOf(resultSet.getString("category")),
                         resultSet.getDouble("damage"),
                         resultSet.getObject("user_id", Integer.class) // Kann null sein
                 );
@@ -49,10 +50,10 @@ public class CardRepositoryImpl implements CardRepository {
 
             while (resultSet.next()) {
                 cards.add(new Cards(
-                        resultSet.getString("id"),
+                        resultSet.getString("card_id"),
                         resultSet.getString("name"),
-                        ElementTypeEnum.valueOf(resultSet.getString("element")),
-                        CardTypeEnum.valueOf(resultSet.getString("type")),
+                        ElementTypeEnum.valueOf(resultSet.getString("element_type")),
+                        CardTypeEnum.valueOf(resultSet.getString("category")),
                         resultSet.getDouble("damage"),
                         resultSet.getObject("user_id", Integer.class)
                 ));
@@ -63,9 +64,9 @@ public class CardRepositoryImpl implements CardRepository {
 
     @Override
     public boolean save(Cards card) throws SQLException {
-        String sql = "INSERT INTO cards (id, name, damage, element, type, user_id) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cards (card_id, name, damage, element_type, category, user_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
-            statement.setString(1, card.getCardId());
+            statement.setString(1, card.getCardId());  // Ensure card.getCardId() is not null
             statement.setString(2, card.getName());
             statement.setDouble(3, card.getDamage());
             statement.setString(4, card.getElementType().toString());
@@ -84,10 +85,9 @@ public class CardRepositoryImpl implements CardRepository {
             throw e;
         }
     }
-
     @Override
     public boolean delete(String cardId) throws SQLException {
-        String sql = "DELETE FROM cards WHERE id = ?";
+        String sql = "DELETE FROM cards WHERE card_id = ?";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setString(1, cardId);
             int rowsAffected = statement.executeUpdate();
@@ -98,7 +98,7 @@ public class CardRepositoryImpl implements CardRepository {
 
     @Override
     public boolean assignCardToUser(String cardId, Integer userId) throws SQLException {
-        String sql = "UPDATE cards SET user_id = ? WHERE id = ?";
+        String sql = "UPDATE cards SET user_id = ? WHERE card_id = ?";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             if (userId != null) {
                 statement.setInt(1, userId);
@@ -122,10 +122,10 @@ public class CardRepositoryImpl implements CardRepository {
 
             while (resultSet.next()) {
                 cards.add(new Cards(
-                        resultSet.getString("id"),
+                        resultSet.getString("card_id"),
                         resultSet.getString("name"),
-                        ElementTypeEnum.valueOf(resultSet.getString("element")),
-                        CardTypeEnum.valueOf(resultSet.getString("type")),
+                        ElementTypeEnum.valueOf(resultSet.getString("element_type")),
+                        CardTypeEnum.valueOf(resultSet.getString("category")),
                         resultSet.getDouble("damage"),
                         resultSet.getObject("user_id", Integer.class)
                 ));
@@ -141,7 +141,7 @@ public class CardRepositoryImpl implements CardRepository {
         }
 
         String placeholders = String.join(",", cardIds.stream().map(id -> "?").toArray(String[]::new));
-        String sql = "SELECT * FROM cards WHERE id IN (" + placeholders + ") AND user_id = ?";
+        String sql = "SELECT * FROM cards WHERE card_id IN (" + placeholders + ") AND user_id = ?";
 
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             for (int i = 0; i < cardIds.size(); i++) {
@@ -153,10 +153,10 @@ public class CardRepositoryImpl implements CardRepository {
             List<Cards> cards = new ArrayList<>();
             while (resultSet.next()) {
                 cards.add(new Cards(
-                        resultSet.getString("id"),
+                        resultSet.getString("card_id"),
                         resultSet.getString("name"),
-                        ElementTypeEnum.valueOf(resultSet.getString("element")),
-                        CardTypeEnum.valueOf(resultSet.getString("type")),
+                        ElementTypeEnum.valueOf(resultSet.getString("element_type")),
+                        CardTypeEnum.valueOf(resultSet.getString("category")),
                         resultSet.getDouble("damage"),
                         resultSet.getObject("user_id", Integer.class)
                 ));
@@ -167,7 +167,7 @@ public class CardRepositoryImpl implements CardRepository {
 
     @Override
     public boolean updateCardUser(String cardId, Integer newUserId) throws SQLException {
-        String sql = "UPDATE cards SET user_id = ? WHERE id = ?";
+        String sql = "UPDATE cards SET user_id = ? WHERE card_id = ?";
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             if (newUserId != null) {
                 statement.setInt(1, newUserId);
