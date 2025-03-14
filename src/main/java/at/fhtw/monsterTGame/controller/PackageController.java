@@ -91,6 +91,10 @@ public class PackageController implements RestController {
         }
 
         try {
+            if (!packagesService.arePackagesAvailable(1)) {
+                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON,
+                        "{\"error\": \"Not enough packages available\"}");
+            }
             List<Cards> purchasedCards = packagesService.buyPackage(token);
 
             String jsonResponse = new ObjectMapper().writeValueAsString(Map.of(
@@ -105,4 +109,6 @@ public class PackageController implements RestController {
             throw new RuntimeException(e);
         }
     }
+
 }
+

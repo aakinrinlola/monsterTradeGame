@@ -184,13 +184,13 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "6) add new packages"
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"67f9048f-99b8-4ae4-b866-d8008d00c53d\", \"Name\":\"WaterGoblin\", \"Damage\": 10.0}, {\"Id\":\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"Name\":\"RegularSpell\", \"Damage\": 50.0}, {\"Id\":\"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"Name\":\"Knight\", \"Damage\": 20.0}, {\"Id\":\"02a9c76e-b17d-427f-9240-2dd49b0d3bfd\", \"Name\":\"RegularSpell\", \"Damage\": 45.0}, {\"Id\":\"2508bf5c-20d7-43b4-8c77-bc677decadef\", \"Name\":\"FireElf\", \"Damage\": 25.0}]"
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage5", "cards": [ { "card_id": "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p", "name": "WaterGoblin", "damage": 16.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "2b3c4d5e-6f7g-8h9i-0j1k-2l3m4n5o6p7q", "name": "Dragon", "damage": 77.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "3c4d5e6f-7g8h-9i0j-1k2l-3m4n5o6p7q8r", "name": "WaterSpell", "damage": 28.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "4d5e6f7g-8h9i-0j1k-2l3m-4n5o6p7q8r9s", "name": "Ork", "damage": 66.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "5e6f7g8h-9i0j-1k2l-3m4n-5o6p7q8r9s0t", "name": "FireSpell", "damage": 30.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }';
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"70962948-2bf7-44a9-9ded-8c68eeac7793\", \"Name\":\"WaterGoblin\", \"Damage\":  9.0}, {\"Id\":\"74635fae-8ad3-4295-9139-320ab89c2844\", \"Name\":\"FireSpell\", \"Damage\": 55.0}, {\"Id\":\"ce6bcaee-47e1-4011-a49e-5a4d7d4245f3\", \"Name\":\"Knight\", \"Damage\": 21.0}, {\"Id\":\"a6fde738-c65a-4b10-b400-6fef0fdb28ba\", \"Name\":\"FireSpell\", \"Damage\": 55.0}, {\"Id\":\"a1618f1e-4f4c-4e09-9647-87e16f1edd2d\", \"Name\":\"FireElf\", \"Damage\": 23.0}]"
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage6", "cards": [ { "card_id": "6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t1u", "name": "WaterGoblin", "damage": 17.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u2v", "name": "Dragon", "damage": 78.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v3w", "name": "WaterSpell", "damage": 29.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2v3w4x", "name": "Ork", "damage": 67.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x5y", "name": "FireSpell", "damage": 31.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" -d "[{\"Id\":\"2272ba48-6662-404d-a9a1-41a9bed316d9\", \"Name\":\"WaterGoblin\", \"Damage\": 11.0}, {\"Id\":\"3871d45b-b630-4a0d-8bc6-a5fc56b6a043\", \"Name\":\"Dragon\", \"Damage\": 70.0}, {\"Id\":\"166c1fd5-4dcb-41a8-91cb-f45dcd57cef3\", \"Name\":\"Knight\", \"Damage\": 22.0}, {\"Id\":\"237dbaef-49e3-4c23-b64b-abf5c087b276\", \"Name\":\"WaterSpell\", \"Damage\": 40.0}, {\"Id\":\"27051a20-8580-43ff-a473-e986b52f297a\", \"Name\":\"FireElf\", \"Damage\": 28.0}]"
+curl -i -X POST http://localhost:10001/packages --header "Content-Type: application/json" --header "Authorization: Bearer admin-mtcgToken" --data '{ "name": "ExamplePackage7", "cards": [ { "card_id": "6f7g8h9i-0j1k-2l3m-4n5o-6p7q8r9s0t0u", "name": "WaterGoblin", "damage": 17.0, "element_type": "WATER", "category": "MONSTER", "user_id": 1 }, { "card_id": "7g8h9i0j-1k2l-3m4n-5o6p-7q8r9s0t1u8v", "name": "Dragon", "damage": 78.0, "element_type": "FIRE", "category": "MONSTER", "user_id": 1 }, { "card_id": "8h9i0j1k-2l3m-4n5o-6p7q-8r9s0t1u2v5w", "name": "WaterSpell", "damage": 29.0, "element_type": "WATER", "category": "SPELL", "user_id": 1 }, { "card_id": "9i0j1k2l-3m4n-5o6p-7q8r-9s0t1u2v3w7x", "name": "Ork", "damage": 67.0, "element_type": "GRASS", "category": "MONSTER", "user_id": 1 }, { "card_id": "0j1k2l3m-4n5o-6p7q-8r9s-0t1u2v3w4x9y", "name": "FireSpell", "damage": 31.0, "element_type": "FIRE", "category": "SPELL", "user_id": 1 } ] }'; 
 echo "Should return HTTP 201"
 echo .
 echo .
@@ -199,14 +199,14 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "7) acquire newly created packages altenhof"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 201"
 echo .
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 201"
 echo .
 echo "should fail (no money):"
-curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d ""
+curl -i -X POST http://localhost:10001/transactions/packages --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d ""
 echo "Should return HTTP 4xx - Not enough money"
 echo .
 echo .
@@ -215,7 +215,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "8) show all acquired cards kienboec"
-curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a list of all cards"
 echo "should fail (no token):"
 curl -i -X GET http://localhost:10001/cards 
@@ -227,7 +227,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "9) show all acquired cards altenhof"
-curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
@@ -236,10 +236,10 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "10) show unconfigured deck"
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a empty-list"
 echo .
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a empty-list"
 echo .
 echo .
@@ -248,16 +248,16 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "11) configure deck"
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d "[\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d "[\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\"]"
 echo "Should return HTTP 2xx"
 echo .
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "[\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"d60e23cf-2238-4d49-844f-c7589ee5342e\", \"02a9c76e-b17d-427f-9240-2dd49b0d3bfd\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d "[\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"d60e23cf-2238-4d49-844f-c7589ee5342e\", \"02a9c76e-b17d-427f-9240-2dd49b0d3bfd\"]"
 echo "Should return HTTP 2xx"
 echo .
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
@@ -265,15 +265,15 @@ echo .
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 echo "should fail and show original from before:"
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "[\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d "[\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\"]"
 echo "Should return HTTP 4xx"
 echo .
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
 echo should fail ... only 3 cards set
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "[\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"d60e23cf-2238-4d49-844f-c7589ee5342e\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d "[\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"d60e23cf-2238-4d49-844f-c7589ee5342e\"]"
 echo "Should return HTTP 4xx - Bad request"
 echo .
 
@@ -281,10 +281,10 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "12) show configured deck"
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
-curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
@@ -294,12 +294,12 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 REM --------------------------------------------------
 echo "13) show configured deck different representation"
 echo kienboec
-curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
 echo altenhof
-curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
 echo .
@@ -309,22 +309,22 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 # --------------------------------------------------
 echo "14) edit user data"
 echo .
-curl -i -X GET http://localhost:10001/users/kienboec --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/users/kienboec --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and current user data"
 echo .
-curl -i -X GET http://localhost:10001/users/altenhof --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/users/altenhof --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and current user data"
 echo .
 curl -i -X PUT http://localhost:10001/users/kienboec --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d "{\"Name\": \"Kienboeck\",  \"Bio\": \"me playin...\", \"Image\": \":-)\"}"
 echo "Should return HTTP 2xx"
 echo .
-curl -i -X PUT http://localhost:10001/users/altenhof --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "{\"Name\": \"Altenhofer\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
+curl -i -X PUT http://localhost:10001/users/altenhof --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d "{\"Name\": \"Altenhofer\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
 echo "Should return HTTP 2xx"
 echo .
-curl -i -X GET http://localhost:10001/users/kienboec --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/users/kienboec --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and new user data"
 echo .
-curl -i -X GET http://localhost:10001/users/altenhof --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/users/altenhof --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and new user data"
 echo .
 echo .
@@ -353,10 +353,10 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "15) stats"
-curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and user stats"
 echo .
-curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and user stats"
 echo .
 echo .
@@ -365,7 +365,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "16) scoreboard"
-curl -i -X GET http://localhost:10001/scoreboard --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/scoreboard --header "Authorization: authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and the scoreboard"
 echo .
 echo .
@@ -374,8 +374,8 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "17) battle"
-curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer kienboec-mtcgToken" &
-curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer altenhof-mtcgToken" &
+curl -i -X POST http://localhost:10001/battles --header "Authorization: authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" &
+curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" &
 wait
 
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
@@ -383,11 +383,11 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 # --------------------------------------------------
 echo "18) Stats"
 echo "kienboec"
-curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and changed user stats"
 echo .
 echo altenhof
-curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer altenhof-mtcgToken"
+curl -i -X GET http://localhost:10001/stats --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and changed user stats"
 echo .
 echo .
@@ -396,7 +396,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "19) scoreboard"
-curl -i -X GET http://localhost:10001/scoreboard --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/scoreboard --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and the changed scoreboard"
 echo .
 echo .
@@ -406,7 +406,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 # --------------------------------------------------
 echo "20) trade"
 echo "check trading deals"
-curl -i -X GET http://localhost:10001/tradings --header "Authorization: Bearer kienboec-mtcgToken"
+curl -i -X GET http://localhost:10001/tradings --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and an empty list"
 echo .
 echo create trading deal

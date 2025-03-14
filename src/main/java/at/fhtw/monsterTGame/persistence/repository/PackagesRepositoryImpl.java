@@ -143,4 +143,16 @@ public class PackagesRepositoryImpl implements PackagesRepository {
             throw new RuntimeException("Error parsing cards JSON from database", e);
         }
     }
+
+    @Override
+    public int countAvailablePackages() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM packages WHERE is_sold = FALSE";
+        try (PreparedStatement statement = unitOfWork.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        }
+        return 0; // Falls keine Pakete vorhanden sind
+    }
 }

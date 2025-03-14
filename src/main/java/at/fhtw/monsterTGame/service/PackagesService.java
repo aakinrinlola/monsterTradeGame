@@ -81,5 +81,8 @@ public class PackagesService {
         }
         return result;
     }
+    public boolean arePackagesAvailable(int requiredPackages) throws SQLException {
+        return packagesRepository.countAvailablePackages() >= requiredPackages;
+    }
 
 }

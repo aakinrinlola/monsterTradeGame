@@ -9,9 +9,11 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.RestController;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import at.fhtw.monsterTGame.service.UserService;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class CardController implements RestController {
@@ -26,48 +28,43 @@ public class CardController implements RestController {
     @Override
     public Response handleRequest(Request request) {
         try {
-            if (request.getMethod() == Method.GET) {
-                return handleGet(request);
-            } else if (request.getMethod() == Method.POST) {
-                return handlePost(request);
-            } else if (request.getMethod() == Method.DELETE) {
-                return handleDelete(request);
+            switch (request.getMethod()) {
+                case GET:
+                    return handleGet(request);
+                case POST:
+                    return handlePost(request);
+                case DELETE:
+                    return handleDelete(request);
+                default:
+                    return new Response(HttpStatus.METHOD_NOT_ALLOWED, ContentType.JSON, "{\"error\": \"Unsupported method\"}");
             }
-
-            return new Response(HttpStatus.METHOD_NOT_ALLOWED, ContentType.JSON, "{\"error\": \"Unsupported method\"}");
         } catch (Exception e) {
             return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
-    private Response handleGet(Request request) {
-        try {
-            String token = request.getHeader("Authorization");
-            if (token == null || token.isEmpty()) {
-                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing Authorization header\"}");
-            }
-
-            int userId = extractUserIdFromToken(token);
-            Collection<Cards> cards = cardService.getCardsByUserId(userId);
-
-            if (cards.isEmpty()) {
-                return new Response(HttpStatus.NO_CONTENT, ContentType.JSON, "");
-            }
-
-            String jsonResponse = new ObjectMapper().writeValueAsString(cards);
-            return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
-        } catch (IllegalArgumentException ex) {
-            return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
-        } catch (Exception ex) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + ex.getMessage() + "\"}");
+    private Response handleGet(Request request) throws SQLException, JsonProcessingException {
+        String token = extractToken(request);
+        if (token == null) {
+            return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing or invalid token\"}");
         }
+
+        int userId = extractUserIdFromToken(token);
+        Collection<Cards> cards = cardService.getCardsByUserId(userId);
+
+        if (cards.isEmpty()) {
+            return new Response(HttpStatus.NO_CONTENT, ContentType.JSON, "");
+        }
+
+        String jsonResponse = new ObjectMapper().writeValueAsString(cards);
+        return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
     }
 
     private Response handlePost(Request request) {
         try {
-            String token = request.getHeader("Authorization");
-            if (token == null || token.isEmpty()) {
-                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing Authorization header\"}");
+            String token = extractToken(request);
+            if (token == null) {
+                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing or invalid token\"}");
             }
 
             int userId = extractUserIdFromToken(token);
@@ -78,50 +75,50 @@ public class CardController implements RestController {
             } else {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Failed to create card\"}");
             }
-        } catch (Exception e) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
+        } catch (JsonProcessingException e) {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid JSON format: " + e.getMessage() + "\"}");
+        } catch (SQLException e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error: " + e.getMessage() + "\"}");
         }
     }
 
-    private Response handleDelete(Request request) {
-        try {
-            String token = request.getHeader("Authorization");
-            if (token == null || token.isEmpty()) {
-                return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing Authorization header\"}");
-            }
+    private Response handleDelete(Request request) throws SQLException {
+        String token = extractToken(request);
+        if (token == null) {
+            return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Missing or invalid token\"}");
+        }
 
-            int userId = extractUserIdFromToken(token);
-            if (request.getPathParts().size() > 1) {
-                String cardId = request.getPathParts().get(1);
+        int userId = extractUserIdFromToken(token);
+        if (request.getPathParts().size() > 1) {
+            String cardId = request.getPathParts().get(1);
 
-                if (cardService.deleteCard(cardId, userId)) {
-                    return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Card deleted successfully\"}");
-                } else {
-                    return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"Card not found or does not belong to user\"}");
-                }
+            if (cardService.deleteCard(cardId, userId)) {
+                return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Card deleted successfully\"}");
             } else {
-                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Card ID required for deletion\"}");
+                return new Response(HttpStatus.NOT_FOUND, ContentType.JSON, "{\"error\": \"Card not found or does not belong to user\"}");
             }
-        } catch (Exception e) {
-            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"" + e.getMessage() + "\"}");
+        } else {
+            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Card ID required for deletion\"}");
         }
     }
 
-    private int extractUserIdFromToken(String token) {
+    private String extractToken(Request request) {
+        String token = request.getHeader("Authorization");
+        System.out.println("CardController Header: " + token);
+        return (token != null && token.startsWith("Bearer ")) ? token.replace("Bearer ", "").trim() : null;
+    }
+
+    private int extractUserIdFromToken(String token) throws SQLException {
         if (token == null || !token.startsWith("authToken-")) {
             throw new IllegalArgumentException("Invalid token format");
         }
 
-        try {
-            User user = userService.getAllUsers()
-                    .stream()
-                    .filter(u -> token.equals(u.getToken()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("Token not associated with any user"));
+        User user = userService.getAllUsers()
+                .stream()
+                .filter(u -> token.equals(u.getToken()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Token not associated with any user"));
 
-            return user.getUserId();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Token validation failed: " + e.getMessage());
-        }
+        return user.getUserId();
     }
 }
