@@ -20,6 +20,9 @@ public class UserController implements RestController {
     public UserController() {
         this.userService = new UserService();
     }
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public Response handleRequest(Request request) {

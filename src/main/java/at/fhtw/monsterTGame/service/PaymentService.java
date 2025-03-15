@@ -15,6 +15,7 @@ public class PaymentService {
         this.userRepository = new UserRepositoryImpl(new UnitOfWork());
     }
 
+
     public Map<String, Object> processPayment(String token) throws SQLException {
         // Benutzer anhand des Tokens abrufen
         User user = userRepository.findToken(token);

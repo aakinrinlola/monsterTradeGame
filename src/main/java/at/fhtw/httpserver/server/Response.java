@@ -37,4 +37,7 @@ public class Response {
                 "\r\n" +
                 this.content;
     }
+    public int getStatus() {
+        return status;
+    }
 }

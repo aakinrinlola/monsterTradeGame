@@ -23,6 +23,9 @@ public class DeckController implements RestController {
     public DeckController() {
         this.deckService = new DeckService();
     }
+    public DeckController(DeckService deckService) {
+        this.deckService = deckService;
+    }
 
     @Override
     public Response handleRequest(Request request) {

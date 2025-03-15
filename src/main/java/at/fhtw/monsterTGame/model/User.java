@@ -25,6 +25,15 @@ public class User {
         this.losses = 0;
         this.draws = 0;
     }
+    // Richtiger Konstruktor mit allen Parametern
+    public User(int id, String username, String password, String token, int coins) {
+        this.userId = id;
+        this.username = username;
+        this.password = password;
+        this.token = token;
+        this.coins = coins;
+    }
+
 
     // Konstruktor für Datenbankabfrage (ohne Wins/Losses/Draws)
     public User(int userId, String username, String password, String token) {
