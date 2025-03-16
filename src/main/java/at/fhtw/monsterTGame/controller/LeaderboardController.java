@@ -26,7 +26,7 @@ public class LeaderboardController implements RestController {
     @Override
     public Response handleRequest(Request request) {
         try {
-            if (request.getMethod() == Method.GET && request.getPathname().equals("/leaderboard")) {
+            if (request.getMethod() == Method.GET && request.getPathname().equals("/scoreboard")) {
                 return fetchLeaderboard();
             }
 

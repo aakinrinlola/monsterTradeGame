@@ -57,7 +57,7 @@ public class DeckController implements RestController {
         return new Response(HttpStatus.OK, ContentType.JSON, jsonResponse);
     }
 
-    private Response processUpdateDeck(Request request) throws SQLException, JsonProcessingException {
+    private Response processUpdateDeck(Request request) throws SQLException{
         String token = extractToken(request);
         if (token == null) {
             return new Response(HttpStatus.UNAUTHORIZED, ContentType.JSON, "{\"error\": \"Authorization required\"}");
@@ -75,9 +75,14 @@ public class DeckController implements RestController {
             return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Invalid request body format\"}");
         }
 
-        List<Cards> cards = deckService.getCardsByIds(cardIds, userId);
-        if (cards.size() != 4) {
-            return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Some cards are invalid or do not belong to the user\"}");
+        List<Cards> cards;
+        try {
+            cards = deckService.getCardsByIds(cardIds, userId);
+            if (cards.size() != 4) {
+                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Some cards are invalid or do not belong to the user\"}");
+            }
+        } catch (SQLException e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error: " + e.getMessage() + "\"}");
         }
 
         try {
@@ -85,13 +90,19 @@ public class DeckController implements RestController {
             existingDeck.setCards(cards);
             deckService.updateDeck(userId, existingDeck);
             return new Response(HttpStatus.OK, ContentType.JSON, "{\"message\": \"Deck updated successfully\"}");
+        } catch (SQLException e) {
+            return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Could not update deck: " + e.getMessage() + "\"}");
         } catch (IllegalArgumentException e) {
             Deck newDeck = new Deck(userId, cards);
-            boolean created = deckService.createDeck(userId, newDeck);
-            if (!created) {
-                return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Could not create deck\"}");
+            try {
+                boolean created = deckService.createDeck(userId, newDeck);
+                if (!created) {
+                    return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Could not create deck\"}");
+                }
+                return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"Deck created successfully\"}");
+            } catch (SQLException ex) {
+                return new Response(HttpStatus.INTERNAL_SERVER_ERROR, ContentType.JSON, "{\"error\": \"Database error while creating deck: " + ex.getMessage() + "\"}");
             }
-            return new Response(HttpStatus.CREATED, ContentType.JSON, "{\"message\": \"Deck created successfully\"}");
         }
     }
 

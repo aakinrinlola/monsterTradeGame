@@ -1,5 +1,5 @@
 package at.fhtw.monsterTGame.persistence.repository;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import at.fhtw.monsterTGame.model.Cards;
 import at.fhtw.monsterTGame.model.Deck;
 import at.fhtw.monsterTGame.model.enums.CardTypeEnum;
@@ -21,11 +21,22 @@ public class DeckRepositoryImpl implements DeckRepository {
 
     @Override
     public boolean createDeck(int userId, Deck deck) throws SQLException {
-        String sql = "INSERT INTO decks (user_id, cards) VALUES (?, ?)";
+        // muss als JSON uebergeben werden weil Cards
+        String sql = "INSERT INTO decks (user_id, cards) VALUES (?, ?::jsonb)";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String cardsJson;
+        try {
+            //Liste in JSON konvertieren
+            cardsJson = objectMapper.writeValueAsString(deck.getCards());
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Konvertieren der Karten in JSON", e);
+        }
 
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
             statement.setInt(1, userId);
-            statement.setObject(2, deck.getCards()); // Karten als JSON speichern
+            // muss als JSONB gesetzt werden
+            statement.setObject(2, cardsJson, java.sql.Types.OTHER);
 
             int affectedRows = statement.executeUpdate();
             unitOfWork.commitTransaction();
@@ -55,9 +66,22 @@ public class DeckRepositoryImpl implements DeckRepository {
 
     @Override
     public boolean updateDeck(int userId, Deck deck) throws SQLException {
-        String sql = "UPDATE decks SET cards = ? WHERE user_id = ?";
+        String sql = "UPDATE decks SET cards = ?::jsonb WHERE user_id = ?";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String cardsJson;
+        try {
+            cardsJson = objectMapper.writeValueAsString(deck.getCards());
+        } catch (Exception e) {
+            throw new RuntimeException("Fehler beim Konvertieren der Karten in JSON", e);
+        }
+
         try (PreparedStatement statement = unitOfWork.prepareStatement(sql)) {
-            statement.setObject(1, deck.getCards());
+            if (deck.getCards() == null || deck.getCards().isEmpty()) {
+                throw new SQLException("Deck contains invalid or missing cards.");
+            }
+            //JSONB setzen
+            statement.setObject(1, cardsJson, java.sql.Types.OTHER);
             statement.setInt(2, userId);
 
             int affectedRows = statement.executeUpdate();

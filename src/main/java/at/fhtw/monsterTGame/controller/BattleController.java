@@ -42,7 +42,11 @@ public class BattleController implements RestController {
             playerOneToken = playerOneToken.replace("Bearer ", "");
 
             // JSON-Request-Body parsen
+            if (request.getBody() == null || request.getBody().isEmpty()) {
+                return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Request body is missing\"}");
+            }
             Map<String, Object> requestBody = new ObjectMapper().readValue(request.getBody(), Map.class);
+
             if (!requestBody.containsKey("opponentId")) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"Opponent ID is required\"}");
             }

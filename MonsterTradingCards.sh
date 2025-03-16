@@ -248,14 +248,27 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "11) configure deck"
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" -d "[\"845f0dc7-37d0-426e-994e-43fc3ac83c08\", \"99f8f8dc-e25e-4a95-aa2c-782823f36e2a\", \"e85e3976-7c86-4d06-9a80-641c2019a79f\", \"171f6076-4eb5-4a7d-b3f2-2d650cc3d237\"]"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" \
+ --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" \
+ --data '[
+    "25a3a3da-e79f-4793-ba5f-ad7759c2d1fb",
+    "ed9b266e-b622-45cc-be20-1a48baf017e7",
+    "f8e5b257-7286-484c-8ece-d47041768a5d",
+    "a835fe53-656d-43e4-859e-ba7aaad7b345"
+  ]'
 echo "Should return HTTP 2xx"
 echo .
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc"
 echo "Should return HTTP 200 - and a list of all cards"
 echo .
-curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" -d "[\"aa9999a0-734c-49c6-8f4a-651864b14e62\", \"d6e9c720-9b5a-40c7-a6b2-bc34752e3463\", \"d60e23cf-2238-4d49-844f-c7589ee5342e\", \"02a9c76e-b17d-427f-9240-2dd49b0d3bfd\"]"
-echo "Should return HTTP 2xx"
+curl -i -X PUT http://localhost:10001/deck --header "Content-Type: application/json" \
+ --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" \
+  --data '[
+    "459cdda5-15de-44d1-86aa-a630c13fbc0e",
+    "454b66b8-48ae-42a6-b6e0-d87e282b3a55",
+    "527f773b-32cd-4baf-8b92-5cdc8c9caea4",
+    "bca4a885-8144-4e97-b3d2-917a3d9296ff"
+  ]'
 echo .
 curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4"
 echo "Should return HTTP 200 - and a list of all cards"
@@ -374,9 +387,14 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 # --------------------------------------------------
 echo "17) battle"
-curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" &
-curl -i -X POST http://localhost:10001/battles --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" &
-wait
+curl -i -X POST http://localhost:10001/battles \
+ --header "Authorization: Bearer authToken-82e6df48-3ca5-4428-b9cd-308d4da05bdc" \
+--data '{"opponentId": 17}'  &
+curl -i -X POST http://localhost:10001/battles \
+ --header "Authorization: Bearer authToken-02011b90-b5b3-4ef6-a4ac-c6d4b3098bc4" \
+--data '{"opponentId": 16}'  &
+wait\
+ 
 
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
